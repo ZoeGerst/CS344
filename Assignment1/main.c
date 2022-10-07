@@ -45,7 +45,37 @@ struct movie *createMovie(char *currLine){
 
 struct student *processFile(char *filePath){
 
+	FILE *movieFile = fopen(filePath, "r");
 
+    char *currLine = NULL;
+    size_t len = 0;
+    ssize_t nread;
+    char *token;
+
+    struct movie *head = NULL;
+    struct movie *tail = NULL;
+
+	while ((nread = getline(&currLine, &len, movieFile)) != -1){
+
+		struct movie *newNode = createMovie(currLine);
+
+		if(head == NULL){
+
+			head = newNode;
+            tail = newNode;
+
+		}
+		else{
+
+			tail->next = newNode;
+            tail = newNode;
+
+		}
+
+	}
+	free(currLine);
+    fclose(movieFile);
+    return head;
 
 }
 
