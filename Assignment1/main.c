@@ -17,7 +17,23 @@ struct movie{
 
 }
 
+struct movie *createMovie(char *currLine){
 
+	
+
+}
+
+struct student *processFile(char *filePath){
+
+
+
+}
+
+void printMovieList(struct movie *list){
+
+
+
+}
 
 int main(int argc, char *argv[]){
 
