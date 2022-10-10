@@ -33,7 +33,7 @@ struct movie *createMovie(char *currLine){
 	
 	printf("%d", currMovie->year);
 
-/*	token = strtok_r(NULL, " ", &saveptr);
+	token = strtok_r(NULL, " ", &saveptr);
 	currMovie->language = calloc(strlen(token) + 1, sizeof(char));
 	strcpy(currMovie->language, token);
 
@@ -44,7 +44,7 @@ struct movie *createMovie(char *currLine){
 	temp2 = calloc(strlen(token) + 1, sizeof(char));
 	currMovie->rating = strtod(temp2, &ptr);
 
-	currMovie->next = NULL;*/
+	currMovie->next = NULL;
 	return currMovie;
 
 }
@@ -84,22 +84,27 @@ struct movie *processFile(char *filePath){
     return head;
 
 }
-
+/*
 void printMovie(struct movie* aMovie){
 
 	printf("%s, %s %s, %s\n", aMovie->title, aMovie->year, aMovie->language, aMovie->rating);
 
 }
+*/
+void printMovieList(struct movie *list, int inputYear){
 
-void printMovieList(struct movie *list){
-
+	int searchMovie = 0;
+	
 	while(list != NULL){
 
-		printMovie(list);
+		if(list->year == inputYear){
+			printf("%s\n", list->title);
+
+		}
+
 		list = list->next;
-
 	}
-
+	
 }
 
 int main(int argc, char *argv[]){
