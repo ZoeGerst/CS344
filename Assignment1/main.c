@@ -107,6 +107,50 @@ void printMovieList(struct movie *list, int inputYear){
 	
 }
 
+void printRatingValue(struct movie *rateValue){
+
+	for(int i = 1900; i <= 2021; i++){
+
+		struct movie *currRate = rateValue;
+		struct movie *zeroRate = NULL;
+		struct movie *maxRate = NULL;
+
+		while(currRate != NULL){
+
+			if(currRate->year == i){
+
+				zeroRate = currRate;
+				while(zeroRate != NULL){
+
+					if(zeroRate->rating >= currRate->rating){
+
+						maxRate = currRate;
+
+					}
+					else{
+
+						maxRate = currRate;
+
+					}
+					zeroRate = zeroRate->next;
+
+				}
+				printf("%d, %.2f, %s\n", maxRate->year, maxRate->rating, maxRate->title);
+				break;
+
+			}
+			else if(currRate->year != i){
+
+				currRate = currRate->next;
+
+			}
+
+		}
+
+	}
+
+}
+
 int main(int argc, char *argv[]){
 
 	if (argc < 2)
