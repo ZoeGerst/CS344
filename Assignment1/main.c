@@ -42,7 +42,7 @@ struct movie *createMovie(char *currLine){
 	char *ptr2;
 	char *temp2;
 	temp2 = calloc(strlen(token) + 1, sizeof(char));
-	currMovie->rating = strtod(temp2, &ptr);
+	currMovie->rating = strtod(token, &ptr);
 
 	currMovie->next = NULL;
 	return currMovie;
@@ -151,15 +151,86 @@ void printRatingValue(struct movie *rateValue){
 
 }
 
+void printLangs(struct movie *langs){
+
+	struct movie *currLanguage = NULL;
+	char *choiceL[20];
+	printf("Enter the language for which you want to see movies: ");
+	scanf("%s", choiceL);
+	currLanguage = langs;
+
+	while(currLanguage != NULL){
+
+		if(strstr(currLanguage->language, choiceL)){
+
+			printf("%d %s\n", currLanguage->year, currLanguage->title);
+
+		}
+		currLanguage = currLanguage->next;
+
+	}
+
+}
+
+int options(struct movie* movieInfo){
+
+	int input;
+	int yearNum;
+	int redo = 1;
+
+	do{
+
+		printf("1. Show movies released in the specified year\n");
+		printf("2. Show highest rated movie for each year\n");
+		printf("3. Show the title and year of release of all movies in a specific language\n");
+		printf("4. Exit from the program\n\n");
+		printf("Enter a choice from 1 to 4: ");
+		scanf("%d", &input);
+
+		if(input == 1){
+
+			printf("Enter the year for which you want to see movies: ");
+			scanf("%d", &yearNum);
+			printMovieList(movieInfo,yearNum);
+			printf("\n");
+
+		}
+		else if(input == 2){
+
+			printRatingValue(movieInfo);
+			printf("\n");
+
+		}
+		else if(input == 3){
+
+			printLangs(movieInfo);
+			printf("\n");
+
+		}
+		else if(input == 4){
+
+			redo = 0;
+			break;
+
+		}
+
+	}
+	while(redo);
+
+}
+
 int main(int argc, char *argv[]){
 
-	if (argc < 2)
-    {
+	int data;
+	if (argc < 2){
+
         printf("You must provide the name of the file to process\n");
         printf("Example usage: ./movies movies_sample_1.txt\n");
         return EXIT_FAILURE;
     }
-    struct movie *list = processFile(argv[1]);
+    struct movie *movieInfo = processFile(argv[1]);
+	printf("Processed file %s and parsed data for %d movies\n", argv[1], data);
+	options(movieInfo);
 //    printMovieList(list);
     return EXIT_SUCCESS;
 
