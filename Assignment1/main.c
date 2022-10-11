@@ -11,7 +11,7 @@
 struct movie{
 
 	int *year;
-	double *rating;
+	double rating;
 	char *title;
 	char *language;
 	struct movie *next;
@@ -23,17 +23,18 @@ struct movie *createMovie(char *currLine){
 	struct movie *currMovie = malloc(sizeof(struct movie));
 	char *saveptr;
 
-	char *token = strtok_r(currLine, " ", &saveptr);
+	char *token = strtok_r(currLine, ",", &saveptr);
 	currMovie->title = calloc(strlen(token) + 1, sizeof(char));
     strcpy(currMovie->title, token);
 
 	char *temp;
-	token = strtok_r(NULL, " ", &saveptr);
+	token = strtok_r(NULL, ",", &saveptr);
     currMovie->year = (int*)calloc(strlen(token) + 1, sizeof(int));
+	*currMovie->year = atoi(token);
 	
-	printf("%d", currMovie->year);
+	//printf("%d\n", *currMovie->year);
 
-	token = strtok_r(NULL, " ", &saveptr);
+	token = strtok_r(NULL, ",", &saveptr);
 	currMovie->language = calloc(strlen(token) + 1, sizeof(char));
 	strcpy(currMovie->language, token);
 
@@ -61,6 +62,8 @@ struct movie *processFile(char *filePath){
     struct movie *head = NULL;
     struct movie *tail = NULL;
 
+	nread = getline(&currLine, &len, movieFile);
+//	nread = getline(&currLine, &len, movieFile);
 	while ((nread = getline(&currLine, &len, movieFile)) != -1){
 
 		struct movie *newNode = createMovie(currLine);
@@ -97,12 +100,18 @@ void printMovieList(struct movie *list, int inputYear){
 	
 	while(list != NULL){
 
-		if(list->year == inputYear){
+//		printf("%d\n", *list->year);
+		if(*list->year == inputYear){
 			printf("%s\n", list->title);
-
+			searchMovie = 1;
+	
 		}
 
 		list = list->next;
+	}
+	if(searchMovie == 0){
+
+		printf("No data about movies released in the year %d\n\n", inputYear);
 	}
 	
 }
@@ -117,7 +126,7 @@ void printRatingValue(struct movie *rateValue){
 
 		while(currRate != NULL){
 
-			if(currRate->year == i){
+			if(*currRate->year == i){
 
 				zeroRate = currRate;
 				while(zeroRate != NULL){
@@ -135,11 +144,11 @@ void printRatingValue(struct movie *rateValue){
 					zeroRate = zeroRate->next;
 
 				}
-				printf("%d, %.2f, %s\n", maxRate->year, maxRate->rating, maxRate->title);
+				printf("%d, %.2f, %s\n", *maxRate->year, maxRate->rating, maxRate->title);
 				break;
 
 			}
-			else if(currRate->year != i){
+			else if(*currRate->year != i){
 
 				currRate = currRate->next;
 
@@ -154,16 +163,16 @@ void printRatingValue(struct movie *rateValue){
 void printLangs(struct movie *langs){
 
 	struct movie *currLanguage = NULL;
-	char *choiceL[20];
+	char choiceL[20];
 	printf("Enter the language for which you want to see movies: ");
 	scanf("%s", choiceL);
 	currLanguage = langs;
 
 	while(currLanguage != NULL){
 
-		if(strstr(currLanguage->language, choiceL)){
+		if(strstr(currLanguage->language, choiceL) != NULL){
 
-			printf("%d %s\n", currLanguage->year, currLanguage->title);
+			printf("%d %s\n", *currLanguage->year, currLanguage->title);
 
 		}
 		currLanguage = currLanguage->next;
