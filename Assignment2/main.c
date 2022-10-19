@@ -115,13 +115,21 @@ struct movie *processFile(char *filePath){
 
 struct dirent *largest(){
 
+	DIR* currDir = opendir(".");
+	struct dirent *aDir;
 
+
+	closedir(currDir);
 
 }
 
 struct dirent *smallest(){
 
+	DIR* currDir = opendir(".");
+	struct dirent *aDir;
 
+
+	closedir(currDir);
 
 }
 
