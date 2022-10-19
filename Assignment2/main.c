@@ -2,12 +2,20 @@
 //Assignment 2: Files and Directories
 //10/24/2022
 //CS344
+//Works Cited:
+//Canvas page: "Exploration: Directories"
 //
 
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <time.h>
+
 
 
 //Movie data struct
@@ -105,7 +113,17 @@ struct movie *processFile(char *filePath){
 
 }
 
+struct dirent *largest(){
 
+
+
+}
+
+struct dirent *smallest(){
+
+
+
+}
 
 
 int main(){
