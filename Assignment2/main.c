@@ -117,6 +117,54 @@ struct dirent *largest(){
 
 	DIR* currDir = opendir(".");
 	struct dirent *aDir;
+	struct dirent *tempDir;
+	struct dirent *largeDir;
+	char *file;
+	char prefix[] = "movies";
+	char nextDir[256];
+	struct stat temp;
+	struct stat infoDir;
+	
+	
+	if(currDir > 0){
+
+		while((aDir = readdir(currDir)) != NULL){
+
+			if(strstr(aDir->d_name, prefix) != NULL && strstr(aDir->d_name, ".csv") != NULL){
+
+				stat(aDir->d_name, &infoDir);
+				off_t a = infoDir.st_size;
+				tempDir = aDir;
+
+				while((tempDir = readdir(currDir)) != NULL){
+
+					if(strstr(tempDir->d_name, prefix) != NULL && strstr(tempDir->d_name, ".csv") != NULL){
+
+						stat(tempDir->d_name, &temp);
+						off_t b = temp.st_size;
+
+						if(a <= b){
+
+							largeDir = tempDir;
+
+						}
+
+						else if(a > b){
+
+							largeDir = aDir;
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+		printf("Now processing the chosen file name %s\n", largeDir->d_name);
+		return largeDir;
+	}
 
 
 	closedir(currDir);
