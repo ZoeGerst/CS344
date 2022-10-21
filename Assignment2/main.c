@@ -120,7 +120,7 @@ struct dirent *largest(){
 	struct dirent *tempDir;
 	struct dirent *largeDir;
 	char *file;
-	char prefix[] = "movies";
+	char prefix[] = "movies_";
 	char nextDir[256];
 	struct stat temp;
 	struct stat infoDir;
@@ -132,11 +132,15 @@ struct dirent *largest(){
 
 			if(strstr(aDir->d_name, prefix) != NULL && strstr(aDir->d_name, ".csv") != NULL){
 
+
 				stat(aDir->d_name, &infoDir);
 				off_t a = infoDir.st_size;
 				tempDir = aDir;
 
 				while((tempDir = readdir(currDir)) != NULL){
+
+				printf("hello world\n");
+					printf(tempDir->d_name);
 
 					if(strstr(tempDir->d_name, prefix) != NULL && strstr(tempDir->d_name, ".csv") != NULL){
 
@@ -146,12 +150,14 @@ struct dirent *largest(){
 						if(a <= b){
 
 							largeDir = tempDir;
+							printf("Now processing the chosen file name %s\n", *largeDir->d_name);
 
 						}
 
 						else if(a > b){
 
 							largeDir = aDir;
+							printf("Now processing the chosen file name %s\n", *largeDir->d_name);
 
 						}
 
@@ -162,8 +168,8 @@ struct dirent *largest(){
 			}
 
 		}
-		printf("Now processing the chosen file name %s\n", largeDir->d_name);
-		return largeDir;
+		//printf("Now processing the chosen file name %s\n", *largeDir->d_name);
+//		return largeDir;
 	}
 
 
@@ -230,7 +236,7 @@ struct dirent *smallest(){
 
 struct dirent *check(char *file){
 
-	DIR* currDir = (".");
+	DIR* currDir = opendir(".");
 	struct dirent *aDir;
 	int fileExist = 0;
 
@@ -262,15 +268,61 @@ char *newDir(){
 
 	srandom(time(NULL));
 	int mkdirVal;
-	char num[];
+	char num[5];
+	char name[] = "/gerstz.movies.";
 	long int ranNum = random() % 99999;
 	sprintf(num, "%d", ranNum);
+	strcat(name, num);
+	struct stat st = {0};
+
+	if(stat(name, &st) == -1){
+
+		mkdir(name, 0700);
+
+	}
 	
 
 }
 
 int main(){
 
+	int choice;
+	int pickFile;
 
+	printf("1. Select file to process\n2. Exit the program\n\n");
+	printf("Enter a choice 1 or 2: ");
+	scanf("%d", &choice);
+
+	if(choice == 1){
+
+		printf("Which file you want to process?\n");
+		printf("Enter 1 to pick the largest file\n");
+		printf("Enter 2 to pick the smallest file\n");
+		printf("Enter 3 to specify the name of a file\n\n");
+		printf("Enter a choice from 1 to 3: ");
+		scanf("%d", &pickFile);
+
+		if(pickFile == 1){
+
+			largest();
+
+		}
+		else if(pickFile == 2){
+
+			
+
+		}
+		else if(pickFile == 3){
+
+			
+
+		}
+
+	}
+	else if(choice == 2){
+
+		return 0;
+
+	}
 
 }
