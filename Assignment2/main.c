@@ -258,6 +258,17 @@ struct dirent *check(char *file){
 	closedir(currDir);
 }
 
+char *newDir(){
+
+	srandom(time(NULL));
+	int mkdirVal;
+	char num[];
+	long int ranNum = random() % 99999;
+	sprintf(num, "%d", ranNum);
+	
+
+}
+
 int main(){
 
 
