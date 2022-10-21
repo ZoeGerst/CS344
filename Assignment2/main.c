@@ -228,6 +228,35 @@ struct dirent *smallest(){
 
 }
 
+struct dirent *check(char *file){
+
+	DIR* currDir = (".");
+	struct dirent *aDir;
+	int fileExist = 0;
+
+	if(currDir > 0){
+
+		while((aDir = readdir(currDir)) != NULL){
+
+			if(strcmp(aDir->d_name, file) == 0){
+
+				printf("File %s exists in current directory\n", aDir->d_name);
+				fileExist = 1;
+				return aDir;
+
+			}
+
+		}
+		if(fileExist == 0){
+
+			printf("File %s does not exist\n", file);
+			return aDir = NULL;
+
+		}
+
+	}
+	closedir(currDir);
+}
 
 int main(){
 
