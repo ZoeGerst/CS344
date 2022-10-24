@@ -4,7 +4,7 @@
 //CS344
 //Works Cited:
 //Canvas page: "Exploration: Directories"
-//
+//https://stackoverflow.com/questions/308695/how-do-i-concatenate-const-literal-strings-in-c
 
 
 #include <stdio.h>
@@ -111,6 +111,14 @@ struct movie *processFile(char *filePath){
     fclose(movieFile);
     return head;
 
+}
+
+char* concat(char* str1, char str2){
+
+	char* result = malloc(strlen(str1) + strlen(str2) + 1);
+	strcpy(result, str1);
+	strcat(result, str2);
+	return result;
 }
 
 struct dirent *largest(){
@@ -286,7 +294,21 @@ char *newDir(){
 
 void newFile(char *file){
 
-	
+	char *nDir = newDir();
+	DIR* currDir = opendir(nDir);
+	struct movie *movFile = processFile(file);
+	FILE* point;
+	printf("Now processing the chosen file named %s\n", file);
+
+	if(currDir > 0){
+
+		for(int i = 0; i < 9999; i++){
+
+			struct movie* temp = movie
+
+		}
+
+	}
 
 }
 
