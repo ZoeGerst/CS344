@@ -284,6 +284,12 @@ char *newDir(){
 
 }
 
+void newFile(char *file){
+
+	
+
+}
+
 int main(){
 
 	int choice;
@@ -309,7 +315,7 @@ int main(){
 		}
 		else if(pickFile == 2){
 
-			
+			smallest();
 
 		}
 		else if(pickFile == 3){
