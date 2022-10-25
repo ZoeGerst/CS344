@@ -359,69 +359,77 @@ void newFile(char *file){
 
 int main(){
 
+	int redo = 1;
 	int choice;
 	int pickFile;
 
-	printf("1. Select file to process\n2. Exit the program\n\n");
-	printf("Enter a choice 1 or 2: ");
-	scanf("%d", &choice);
-	int doesExist = 1;
+	do{
 
-	if(choice == 1){
+		printf("1. Select file to process\n2. Exit the program\n\n");
+		printf("Enter a choice 1 or 2: ");
+		scanf("%d", &choice);
+		int doesExist = 1;
 
-		while(doesExist == 1){
+		if(choice == 1){
 
-			struct dirent *large;
-			struct dirent *small;
-			struct dirent *specific;
-			char *specifyFile;
+			while(doesExist == 1){
 
-			printf("Which file you want to process?\n");
-			printf("Enter 1 to pick the largest file\n");
-			printf("Enter 2 to pick the smallest file\n");
-			printf("Enter 3 to specify the name of a file\n\n");
-			printf("Enter a choice from 1 to 3: ");
-			scanf("%d", &pickFile);
+				struct dirent *large;
+				struct dirent *small;
+				struct dirent *specific;
+				char *specifyFile;
 
-			if(pickFile == 1){
+				printf("Which file you want to process?\n");
+				printf("Enter 1 to pick the largest file\n");
+				printf("Enter 2 to pick the smallest file\n");
+				printf("Enter 3 to specify the name of a file\n\n");
+				printf("Enter a choice from 1 to 3: ");
+				scanf("%d", &pickFile);
+
+				if(pickFile == 1){
 			
 			
-				large = largest();
-				newFile(large->d_name);
-			
-
-			}
-			else if(pickFile == 2){
-
-				small = smallest();
-				newFile(small->d_name);
-
-			}
-			else if(pickFile == 3){
-
-				printf("Enter the complete file name: ");
-				scanf("%s", specifyFile);
-				specific = check(specifyFile);
-		
-				if(specifyFile == NULL){
-
-					doesExist = 1;
-
-				}
-				else if(specifyFile != NULL){
-
-					newFile(specifyFile->d_name);
+					large = largest();
+					newFile(large->d_name);
 					doesExist = 0;
 
 				}
+				else if(pickFile == 2){
 
+					small = smallest();
+					newFile(small->d_name);
+					doesExist = 0;
+
+				}
+				else if(pickFile == 3){
+
+					printf("Enter the complete file name: ");
+					scanf("%s", specifyFile);
+					specific = check(specifyFile);
+		
+					if(specifyFile == NULL){
+
+						doesExist = 1;
+
+					}
+					else if(specifyFile != NULL){
+
+						newFile(specifyFile->d_name);
+						doesExist = 0;
+
+					}
+
+				}
 			}
 		}
-	}
-	else if(choice == 2){
+		else if(choice == 2){
 
-		return 0;
+			return 0;
 
+		}
 	}
+	while(redo);
+	
+	return 0;
 
 }
