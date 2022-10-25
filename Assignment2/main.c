@@ -147,8 +147,8 @@ struct dirent *largest(){
 
 				while((tempDir = readdir(currDir)) != NULL){
 
-				printf("hello world\n");
-					printf(tempDir->d_name);
+		//		printf("hello world\n");
+		//			printf(tempDir->d_name);
 
 					if(strstr(tempDir->d_name, prefix) != NULL && strstr(tempDir->d_name, ".csv") != NULL){
 
@@ -176,8 +176,8 @@ struct dirent *largest(){
 			}
 
 		}
-		//printf("Now processing the chosen file name %s\n", *largeDir->d_name);
-//		return largeDir;
+		printf("Now processing the chosen file name %s\n", *largeDir->d_name);
+		return largeDir;
 	}
 
 
@@ -345,7 +345,7 @@ void newFile(char *file){
 		movFile = freeMovie;
 
 	}
-	free(movFile)
+	free(movFile);
 }
 
 int main(){
@@ -359,6 +359,8 @@ int main(){
 
 	if(choice == 1){
 
+		struct dirent *large;
+
 		printf("Which file you want to process?\n");
 		printf("Enter 1 to pick the largest file\n");
 		printf("Enter 2 to pick the smallest file\n");
@@ -368,7 +370,9 @@ int main(){
 
 		if(pickFile == 1){
 
-			largest();
+			large = largest();
+			newFile(large->d_name);
+			
 
 		}
 		else if(pickFile == 2){
