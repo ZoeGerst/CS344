@@ -407,17 +407,22 @@ int main(){
 					scanf("%s", specifyFile);
 					specific = check(specifyFile);
 		
-					if(specifyFile == NULL){
+					if(specific == NULL){
 
 						doesExist = 1;
 
 					}
-					else if(specifyFile != NULL){
+					else if(specific != NULL){
 
-						newFile(specifyFile->d_name);
+						newFile(specific->d_name);
 						doesExist = 0;
 
 					}
+
+				}
+				else{
+
+					printf("You entered an incorrect choice. Try again.\n\n");
 
 				}
 			}
@@ -425,6 +430,11 @@ int main(){
 		else if(choice == 2){
 
 			return 0;
+
+		}
+		else{
+
+			printf("You entered an incorrect choice. Try again.\n\n");
 
 		}
 	}
