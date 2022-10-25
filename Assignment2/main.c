@@ -128,7 +128,7 @@ struct dirent *largest(){
 	struct dirent *tempDir;
 	struct dirent *largeDir;
 	char *file;
-	char prefix[] = "movies_";
+	char prefix[20] = "movies_";
 	char nextDir[256];
 	struct stat temp;
 	struct stat infoDir;
@@ -158,14 +158,14 @@ struct dirent *largest(){
 						if(a <= b){
 
 							largeDir = tempDir;
-							printf("Now processing the chosen file name %s\n", *largeDir->d_name);
+	//						printf("Now processing the chosen file name %s\n", *largeDir->d_name);
 
 						}
 
 						else if(a > b){
 
 							largeDir = aDir;
-							printf("Now processing the chosen file name %s\n", *largeDir->d_name);
+	//						printf("Now processing the chosen file name %s\n", *largeDir->d_name);
 
 						}
 
@@ -192,7 +192,7 @@ struct dirent *smallest(){
 	struct dirent *tempDir;
 	struct dirent *smallDir;
 	char *file;
-	char prefix[] = "movies";
+	char prefix[20] = "movies_";
 	char nextDir[256];
 	struct stat temp;
 	struct stat infoDir;
@@ -263,7 +263,7 @@ struct dirent *check(char *file){
 		}
 		if(fileExist == 0){
 
-			printf("File %s does not exist\n", file);
+			printf("File %s was not found. Try again\n", file);
 			return aDir = NULL;
 
 		}
@@ -276,16 +276,25 @@ char *newDir(){
 
 	srandom(time(NULL));
 	int mkdirVal;
-	char num[5];
-	char name[] = "/gerstz.movies.";
+	char num[20];
+	char name = concat("gerstz.movies.", num);
 	long int ranNum = random() % 99999;
 	sprintf(num, "%d", ranNum);
 	strcat(name, num);
 	struct stat st = {0};
 
-	if(stat(name, &st) == -1){
+	mkdirVal = mkdir(name, 0700);
 
-		mkdir(name, 0700);
+	if(mkdirVal == 0){
+
+		printf("Created directory with name %s \n", name);
+		return name;
+
+	}
+	else{
+
+		printf("Cannot create Directory\n");
+		exit(1);
 
 	}
 	
@@ -323,7 +332,7 @@ void newFile(char *file){
 						exit(1);
 
 					}
-					fprint(point, "%s", temp->title);
+					printf(point, "%s", temp->title);
 					fclose(point);
 
 				}
