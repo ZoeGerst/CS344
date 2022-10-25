@@ -295,6 +295,7 @@ char *newDir(){
 void newFile(char *file){
 
 	char *nDir = newDir();
+	char num[20];
 	DIR* currDir = opendir(nDir);
 	struct movie *movFile = processFile(file);
 	FILE* point;
@@ -302,14 +303,49 @@ void newFile(char *file){
 
 	if(currDir > 0){
 
-		for(int i = 0; i < 9999; i++){
+		for(int i = 1900; i < 2021; i++){
 
-			struct movie* temp = movie
+			struct movie* temp = movFile;
+			
+			while(temp != NULL){
+
+				if(temp->year == i){
+
+					sprintf(num, "%d", i);
+					char *first = concat(nDir, "/");
+					char *second = concat(num, ".txt");
+					char* strName = concat(first, second);
+					point = fopen(strName, "a");
+
+					if(point == NULL){
+
+						printf("Unable to create file %s\n", strName);
+						exit(1);
+
+					}
+					fprint(point, "%s", temp->title);
+					fclose(point);
+
+				}
+				temp = temp->next;
+
+			}
 
 		}
 
 	}
+	closedir(currDir);
+	struct movie* freeMovie = NULL;
+	
+	while(movFile != NULL){
 
+		freeMovie->next;
+		free(movFile->title);
+		free(movFile->language);
+		movFile = freeMovie;
+
+	}
+	free(movFile)
 }
 
 int main(){
