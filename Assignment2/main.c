@@ -63,6 +63,7 @@ struct movie *createMovie(char *currLine){
 
 	//Next node is set to NULL for the next entry
 	currMovie->next = NULL;
+	//printf("test creat\n");
 	return currMovie;
 
 }
@@ -110,12 +111,14 @@ struct movie *processFile(char *filePath){
 	free(currLine);
     fclose(movieFile);
     return head;
+  	
 
 }
 
-char* concat(char* str1, char str2){
+char* concat(char* str1, char str2[20]){
 
-	char* result = malloc(strlen(str1) + strlen(str2) + 1);
+	char *result;// = malloc(strlen(str1) + strlen(str2) + 1);
+	result = (char*) malloc(strlen(str1) + strlen(str2) + 1);
 	strcpy(result, str1);
 	strcat(result, str2);
 	return result;
@@ -136,18 +139,23 @@ struct dirent *largest(){
 	
 	if(currDir > 0){
 
+		//aDir = readdir(currDir)
 		while((aDir = readdir(currDir)) != NULL){
 
 			if(strstr(aDir->d_name, prefix) != NULL && strstr(aDir->d_name, ".csv") != NULL){
-
 
 				stat(aDir->d_name, &infoDir);
 				off_t a = infoDir.st_size;
 				tempDir = aDir;
 
+				//printf("hello world\n");
+	//			while(1){
 				while((tempDir = readdir(currDir)) != NULL){
+	
+				//while(readdir(currDir) != NULL){
+				printf("testing while\n");
+					//tempDir = readdir(currDir);
 
-		//		printf("hello world\n");
 		//			printf(tempDir->d_name);
 
 					if(strstr(tempDir->d_name, prefix) != NULL && strstr(tempDir->d_name, ".csv") != NULL){
@@ -156,17 +164,16 @@ struct dirent *largest(){
 						off_t b = temp.st_size;
 
 						if(a <= b){
-
 							largeDir = tempDir;
-	//						printf("Now processing the chosen file name %s\n", *largeDir->d_name);
-
+		//					printf("Now processing the chosen file name %s\n", largeDir->d_name);
+		//					 printf("test print\n");
 						}
 
 						else if(a > b){
 
 							largeDir = aDir;
-	//						printf("Now processing the chosen file name %s\n", *largeDir->d_name);
 
+		//					printf("Now processing the chosen file name %s\n", *largeDir->d_name);
 						}
 
 					}
@@ -176,12 +183,12 @@ struct dirent *largest(){
 			}
 
 		}
-		printf("Now processing the chosen file name %s\n", *largeDir->d_name);
-		return largeDir;
+		printf("Now processing the chosen file name %s\n", largeDir->d_name);
 	}
 
 
 	closedir(currDir);
+	return largeDir;
 
 }
 
@@ -254,7 +261,6 @@ struct dirent *check(char *file){
 
 			if(strcmp(aDir->d_name, file) == 0){
 
-				printf("File %s exists in current directory\n", aDir->d_name);
 				fileExist = 1;
 				return aDir;
 
@@ -276,14 +282,20 @@ char *newDir(){
 
 	srandom(time(NULL));
 	int mkdirVal;
-	char num[20];
-	char name = concat("gerstz.movies.", num);
+	char num[5];
+
+	for(int i = 0; i < 5; i++){
+
+		num[i] = 0;
+
+	}
+	char *name = concat("gerstz.movies.", num);
 	long int ranNum = random() % 99999;
 	sprintf(num, "%d", ranNum);
 	strcat(name, num);
 	struct stat st = {0};
 
-	mkdirVal = mkdir(name, 0700);
+	mkdirVal = mkdir(name, 0750);
 
 	if(mkdirVal == 0){
 
@@ -303,23 +315,28 @@ char *newDir(){
 
 void newFile(char *file){
 
+	printf("Now processing the chosen file named %s\n", file);
 	char *nDir = newDir();
 	char num[20];
 	DIR* currDir = opendir(nDir);
 	struct movie *movFile = processFile(file);
+	//movFile = processFile(file);
+//	printf("test new file\n");
 	FILE* point;
-	printf("Now processing the chosen file named %s\n", file);
 
 	if(currDir > 0){
 
 		for(int i = 1900; i < 2021; i++){
 
 			struct movie* temp = movFile;
+			int tempVar = *temp->year;//(intptr_t)temp->year;
 			
 			while(temp != NULL){
+		//		printf("tempVar %d\n\n", tempVar);
+		//		printf("i %d\n\n", i);
+				if(tempVar == i){
 
-				if(temp->year == i){
-
+		//printf("test if\n");
 					sprintf(num, "%d", i);
 					char *first = concat(nDir, "/");
 					char *second = concat(num, ".txt");
@@ -332,7 +349,11 @@ void newFile(char *file){
 						exit(1);
 
 					}
-					printf(point, "%s", temp->title);
+
+					if(*temp->year == i){
+						
+						fprintf(point, "%s", temp->title);
+					}
 					fclose(point);
 
 				}
@@ -377,7 +398,7 @@ int main(){
 				struct dirent *large;
 				struct dirent *small;
 				struct dirent *specific;
-				char *specifyFile;
+				char specifyFile[20];
 
 				printf("Which file you want to process?\n");
 				printf("Enter 1 to pick the largest file\n");
@@ -390,8 +411,11 @@ int main(){
 			
 			
 					large = largest();
+					printf("large worked\n");
 					newFile(large->d_name);
+					printf("new file worked\n");
 					doesExist = 0;
+					printf("does exist worked\n");
 
 				}
 				else if(pickFile == 2){
@@ -404,7 +428,7 @@ int main(){
 				else if(pickFile == 3){
 
 					printf("Enter the complete file name: ");
-					scanf("%s", specifyFile);
+					scanf("%20s", specifyFile);
 					specific = check(specifyFile);
 		
 					if(specific == NULL){
