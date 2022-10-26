@@ -203,13 +203,16 @@ struct dirent *largest(){
 
 }
 
+//finds smallest .csv file
 struct dirent *smallest(){
 
+	//starting directory
 	DIR* currDir = opendir(".");
 	struct dirent *aDir;
 	struct dirent *tempDir;
 	struct dirent *smallDir;
 	char *file;
+	//looks for files beginning with these chars
 	char prefix[20] = "movies_";
 	char nextDir[256];
 	struct stat temp;
@@ -218,10 +221,12 @@ struct dirent *smallest(){
 	
 	if(currDir > 0){
 
+		//checks to make sure there is something in the directory
 		while((aDir = readdir(currDir)) != NULL){
 
 			if(strstr(aDir->d_name, prefix) != NULL && strstr(aDir->d_name, ".csv") != NULL){
 
+				//gets info of the contents
 				stat(aDir->d_name, &infoDir);
 				off_t a = infoDir.st_size;
 				tempDir = aDir;
@@ -233,6 +238,7 @@ struct dirent *smallest(){
 						stat(tempDir->d_name, &temp);
 						off_t b = temp.st_size;
 
+						//compares files
 						if(a <= b){
 
 							smallDir = aDir;
@@ -260,27 +266,37 @@ struct dirent *smallest(){
 
 }
 
+//checks to see if the file is in the directory
 struct dirent *check(char *file){
 
+	//starting directory
 	DIR* currDir = opendir(".");
 	struct dirent *aDir;
 	int fileExist = 0;
 
 	if(currDir > 0){
 
+		//reads through directory
 		while((aDir = readdir(currDir)) != NULL){
 
+			//if the user's input matches the file name, it's processed
 			if(strcmp(aDir->d_name, file) == 0){
 
 				fileExist = 1;
 				return aDir;
 
 			}
+			/*else{
+
+				printf("File %s was not found. Try again\n", file);
+				return aDir = NULL;
+			}*/
 
 		}
+		//if the user's input does not match a file
 		if(fileExist == 0){
 
-			printf("File %s was not found. Try again\n", file);
+			printf("File %s was not found. Try again\n\n", file);
 			return aDir = NULL;
 
 		}
@@ -289,17 +305,21 @@ struct dirent *check(char *file){
 	closedir(currDir);
 }
 
+//makes a new directory
 char *newDir(){
 
 	srandom(time(NULL));
 	int mkdirVal;
+	//random number
 	char num[5];
 
+	//fills string with random numbers
 	for(int i = 0; i < 5; i++){
 
 		num[i] = 0;
 
 	}
+	//combines strings
 	char *name = concat("gerstz.movies.", num);
 	long int ranNum = random() % 99999;
 	sprintf(num, "%d", ranNum);
@@ -308,15 +328,16 @@ char *newDir(){
 
 	mkdirVal = mkdir(name, 0750);
 
+	//returns new directory
 	if(mkdirVal == 0){
 
-		printf("Created directory with name %s \n", name);
+		printf("Created directory with name %s \n\n", name);
 		return name;
 
 	}
 	else{
 
-		printf("Cannot create Directory\n");
+		printf("Cannot create Directory\n\n");
 		exit(1);
 
 	}
@@ -324,6 +345,7 @@ char *newDir(){
 
 }
 
+//adds files to new directories
 void newFile(char *file){
 
 	printf("Now processing the chosen file named %s\n", file);
@@ -337,6 +359,7 @@ void newFile(char *file){
 
 	if(currDir > 0){
 
+		//matches movies to the file years
 		for(int i = 1900; i < 2021; i++){
 
 			struct movie* temp = movFile;
@@ -349,6 +372,8 @@ void newFile(char *file){
 
 		//printf("test if\n");
 					sprintf(num, "%d", i);
+
+					//combines strings
 					char *first = concat(nDir, "/");
 					char *second = concat(num, ".txt");
 					char* strName = concat(first, second);
@@ -361,6 +386,7 @@ void newFile(char *file){
 
 					}
 
+					//if the year matches the file name, add movie to file
 					if(*temp->year == i){
 						
 						fprintf(point, "%s", temp->title);
@@ -395,40 +421,48 @@ int main(){
 	int choice;
 	int pickFile;
 
+	//repeats the program
 	do{
 
 		printf("1. Select file to process\n2. Exit the program\n\n");
 		printf("Enter a choice 1 or 2: ");
+		//user's first choice
 		scanf("%d", &choice);
 		int doesExist = 1;
 
 		if(choice == 1){
 
+			//makes sure files exist
 			while(doesExist == 1){
 
 				struct dirent *large;
 				struct dirent *small;
 				struct dirent *specific;
+				//lets user process a specific file
 				char specifyFile[20];
 
-				printf("Which file you want to process?\n");
+				printf("\nWhich file you want to process?\n");
 				printf("Enter 1 to pick the largest file\n");
 				printf("Enter 2 to pick the smallest file\n");
 				printf("Enter 3 to specify the name of a file\n\n");
 				printf("Enter a choice from 1 to 3: ");
+				//user's second choice
 				scanf("%d", &pickFile);
 
+				//calls largest function
 				if(pickFile == 1){
 			
 			
 					large = largest();
-					printf("large worked\n");
+				//	printf("large worked\n");
 					newFile(large->d_name);
-					printf("new file worked\n");
+				//	printf("new file worked\n");
 					doesExist = 0;
-					printf("does exist worked\n");
+				//	printf("does exist worked\n");
 
 				}
+
+				//calls smallest function
 				else if(pickFile == 2){
 
 					small = smallest();
@@ -436,6 +470,8 @@ int main(){
 					doesExist = 0;
 
 				}
+				
+				//lets user type specific file name
 				else if(pickFile == 3){
 
 					printf("Enter the complete file name: ");
@@ -455,6 +491,8 @@ int main(){
 					}
 
 				}
+
+				//error handling
 				else{
 
 					printf("You entered an incorrect choice. Try again.\n\n");
@@ -462,11 +500,15 @@ int main(){
 				}
 			}
 		}
+
+		//lets user end program
 		else if(choice == 2){
 
 			return 0;
 
 		}
+
+		//error handling
 		else{
 
 			printf("You entered an incorrect choice. Try again.\n\n");
