@@ -5,6 +5,8 @@
 //Works Cited:
 //Canvas page: "Exploration: Directories"
 //https://stackoverflow.com/questions/308695/how-do-i-concatenate-const-literal-strings-in-c
+//https://stackoverflow.com/questions/3554120/open-directory-using-c
+//https://stackoverflow.com/questions/61050429/cant-use-sscanf-in-c-for-char-array
 
 
 #include <stdio.h>
@@ -115,22 +117,28 @@ struct movie *processFile(char *filePath){
 
 }
 
+
 char* concat(char* str1, char str2[20]){
 
-	char *result;// = malloc(strlen(str1) + strlen(str2) + 1);
+	char *result;
+	//ties two strings together
 	result = (char*) malloc(strlen(str1) + strlen(str2) + 1);
+	//copies string
 	strcpy(result, str1);
 	strcat(result, str2);
 	return result;
 }
 
+//finds the largest .csv file
 struct dirent *largest(){
 
+	//starting directory
 	DIR* currDir = opendir(".");
 	struct dirent *aDir;
 	struct dirent *tempDir;
 	struct dirent *largeDir;
 	char *file;
+	//looks for files beginning with these chars
 	char prefix[20] = "movies_";
 	char nextDir[256];
 	struct stat temp;
@@ -139,11 +147,13 @@ struct dirent *largest(){
 	
 	if(currDir > 0){
 
+		//checks to make sure there is something in the directory
 		//aDir = readdir(currDir)
 		while((aDir = readdir(currDir)) != NULL){
 
 			if(strstr(aDir->d_name, prefix) != NULL && strstr(aDir->d_name, ".csv") != NULL){
 
+				//gets info of the contents
 				stat(aDir->d_name, &infoDir);
 				off_t a = infoDir.st_size;
 				tempDir = aDir;
@@ -153,7 +163,7 @@ struct dirent *largest(){
 				while((tempDir = readdir(currDir)) != NULL){
 	
 				//while(readdir(currDir) != NULL){
-				printf("testing while\n");
+		//		printf("testing while\n");
 					//tempDir = readdir(currDir);
 
 		//			printf(tempDir->d_name);
@@ -163,6 +173,7 @@ struct dirent *largest(){
 						stat(tempDir->d_name, &temp);
 						off_t b = temp.st_size;
 
+						//compares files
 						if(a <= b){
 							largeDir = tempDir;
 		//					printf("Now processing the chosen file name %s\n", largeDir->d_name);
@@ -242,10 +253,10 @@ struct dirent *smallest(){
 
 		}
 		printf("Now processing the chosen file name %s\n", smallDir->d_name);
-		return smallDir;
 	}
 
 	closedir(currDir);
+	return smallDir;
 
 }
 
