@@ -305,7 +305,53 @@ int main(int argc, char ** argv){
 			}
 
 		}
-		
+		else if(strcmp(newargv[0], "status") == 0){
+
+			printf("%s\n", status);
+			fflush(stdout);
+
+		}
+		else{
+
+			pid_t childPid = fork();
+
+			if(childPid == 0){
+
+				if(!object->last){
+
+					sigaction(SIGINT, &signal_event, NULL);
+
+				}
+				smallsh_launch(newargv, object);
+
+			}
+			else if(childPid == -1){
+
+				perror("fork");
+				exit(EXIT_FAILURE);
+
+			}
+			else{
+
+				if(object->last){
+
+					list[processes] = childPid;
+					processes++;
+					printf("background pid is %d\n", childPid);
+					fflush(stdout);
+
+				}
+				else{
+
+					fore_pro(childPid, status);
+
+				}
+
+			}
+
+		}
+		free(object);
+		free(newargv);
 
 	}
 	while(repeat);
