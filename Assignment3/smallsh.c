@@ -29,7 +29,7 @@ struct command{
 
 };
 
-char read_line(){
+char *read_line(){
 
 	char *line = NULL;
 	ssize_t bufsize = MAX_CHARS;
