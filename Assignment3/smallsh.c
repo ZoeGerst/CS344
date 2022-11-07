@@ -174,9 +174,23 @@ void smallsh_launch(char **args, struct command *object){
 }
 
 
-void fore_pro(){
+void fore_pro(pid_t wpid, char *term){
 
+	int position;
+	waitpid(wpid, &position, 0);
 
+	if(WIFEXITED(position)){
+
+		printf("exit value %d\n", WEXITSTATUS(position));
+
+	}
+	if(WIFSIGNALED(position)){
+
+		printf("terminated by signal %d\n", WTERMSIG(position));
+		printf("%s\n", term);
+		fflush(stdout);
+
+	}
 
 }
 
