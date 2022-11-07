@@ -212,7 +212,7 @@ int main(int argc, char ** argv){
 	do{
 
 		char *line;
-		char **args;
+		char **newargv;
 		int zombie_status;
 		pid_t bgp;
 
@@ -240,8 +240,71 @@ int main(int argc, char ** argv){
 
 		printf(": ");	
 		line = read_line();
-		args = split_line(line, object);
+		newargv = split_line(line, object);
 
+		if(object->argc == 0 || newargv[0] == NULL){
+
+			repeat = 0;
+		
+		}
+		else if(strncmp(newargv[0], "#", 1) == 0){
+
+			repeat = 0;
+
+		}
+		else if(strncmp(newargv[0], "exit", 1) == 0){
+
+			if(object->argc > 2){
+
+				printf("unexpected argument\n");
+				fflush(stdout);
+
+			}
+			else if(newargv[1]){
+
+				printf("unexpected argument\n");
+				fflush(stdout);
+
+			}
+			else{
+
+				repeat = 1;
+				printf("killing background processes\n");
+				fflush(stdout);
+	
+				for(int i = 0; i < processes; i++){
+
+					kill(list[processes], SIGTERM);
+
+				}
+
+			}
+
+		}
+		else if(strcmp(newargv[0], "cd") == 0){
+
+			if(object->argc > 2){
+
+				printf("unexpected argument\n");
+
+			}
+
+			if(newargv[1]){
+
+				if(chdir(newargv[1]) != 0){
+
+					printf("%s: no such file or directory\n", newargv[1]);
+
+				}
+
+			}
+			else{
+
+				chdir(getenv("HOME"));
+
+			}
+
+		}
 		
 
 	}
