@@ -44,6 +44,11 @@ char **split_line(char *line, struct command *object){
 	int bufsize = MAX, position = 1;
 	char **tokens = malloc(bufsize * sizeof(char *));
 	char *token;
+	object->last = 0;
+	object->move_in = 0;
+	object->move_out = 0;
+	object->argc = 0;
+//	object->in = 1;
 
 	if(!tokens){
 
@@ -168,7 +173,7 @@ void smallsh_launch(char **args, struct command *object){
 
 	}
 
-	execcvp(args[0], args);
+	execvp(args[0], args);
 	printf("%s: no such file or directory\n", args[0]);
 	exit(EXIT_FAILURE);
 }
@@ -207,6 +212,7 @@ int main(int argc, char ** argv){
 	signal_event.sa_handler = SIG_DFL;
 	ignore_event.sa_handler = SIG_IGN;
 	sigaction(SIGINT, &ignore_event, NULL);
+	pid_t childPid = fork();
 
 
 	do{
@@ -244,17 +250,18 @@ int main(int argc, char ** argv){
 
 		if(object->argc == 0 || newargv[0] == NULL){
 
-			repeat = 0;
+			repeat = 1;
 		
 		}
 		else if(strncmp(newargv[0], "#", 1) == 0){
 
-			repeat = 0;
+			//printf("Test #\n");
+			repeat = 1;
 
 		}
-		else if(strncmp(newargv[0], "exit", 1) == 0){
+		else if(strcmp(newargv[0], "exit") == 0){
 
-			if(object->argc > 2){
+/*			if(object->argc > 2){
 
 				printf("unexpected argument\n");
 				fflush(stdout);
@@ -268,7 +275,6 @@ int main(int argc, char ** argv){
 			}
 			else{
 
-				repeat = 1;
 				printf("killing background processes\n");
 				fflush(stdout);
 	
@@ -276,7 +282,8 @@ int main(int argc, char ** argv){
 
 					kill(list[processes], SIGTERM);
 
-				}
+				}*/
+				repeat = 0;
 
 			}
 
@@ -305,15 +312,16 @@ int main(int argc, char ** argv){
 			}
 
 		}
-		else if(strcmp(newargv[0], "status") == 0){
+		else if(strncmp(newargv[0], "status", 6) == 0){
 
-			printf("%s\n", status);
-			fflush(stdout);
+	//		repeat = 1;
+	//		printf("%s\n", status);
+	//		fflush(stdout);
+			fore_pro(childPid, status);
 
 		}
 		else{
 
-			pid_t childPid = fork();
 
 			if(childPid == 0){
 
@@ -341,11 +349,11 @@ int main(int argc, char ** argv){
 					fflush(stdout);
 
 				}
-				else{
+			/*	else{
 
 					fore_pro(childPid, status);
 
-				}
+				}*/
 
 			}
 
