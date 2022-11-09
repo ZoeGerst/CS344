@@ -1,6 +1,6 @@
 //Zoe Gerst
 //Assignment 3: smallsh
-//11/7/2022
+//11/9/2022
 //CS344
 //Works Cited:
 //https://brennan.io/2015/01/16/write-a-shell-in-c/
@@ -191,7 +191,7 @@ void fore_pro(pid_t wpid, char *term){
 	}
 	if(WIFSIGNALED(position)){
 
-		printf("terminated by signal %d\n", WTERMSIG(position));
+		printf("terminated by signal %d", WTERMSIG(position));
 		printf("%s\n", term);
 		fflush(stdout);
 
@@ -217,12 +217,16 @@ int main(int argc, char ** argv){
 
 	do{
 
+		struct command *object = malloc(sizeof(struct command));
+		object->last = 0;
+		object->move_in = 0;
+		object->move_out = 0;
+		object->argc = 0;
 		char *line;
 		char **newargv;
 		int zombie_status;
 		pid_t bgp;
 
-		struct command *object = malloc(sizeof(struct command));
 		
 		bgp = waitpid(-1, &zombie_status, WNOHANG);
 
@@ -275,15 +279,15 @@ int main(int argc, char ** argv){
 			}
 			else{
 
-				printf("killing background processes\n");
-				fflush(stdout);
+				printf("killing background processes\n");*/
+			repeat = 0;
+			fflush(stdout);
 	
-				for(int i = 0; i < processes; i++){
+			for(int i = 0; i < processes; i++){
 
-					kill(list[processes], SIGTERM);
+				kill(list[processes], SIGTERM);
 
-				}*/
-				repeat = 0;
+				//}
 
 			}
 
@@ -349,7 +353,7 @@ int main(int argc, char ** argv){
 					fflush(stdout);
 
 				}
-			/*	else{
+		/*		else{
 
 					fore_pro(childPid, status);
 
@@ -358,8 +362,10 @@ int main(int argc, char ** argv){
 			}
 
 		}
+		free(line);
 		free(object);
 		free(newargv);
+		
 
 	}
 	while(repeat);
