@@ -225,11 +225,114 @@ void fore_pro2(int event){
 
 }
 
+void other(int* cStat, int* bg,struct sigaction ctrlC, char* useCmd[], char cmdIn[], char cmdOut[]){
+
+	int userInt;
+	int userOut;
+	int assign;
+	pid_t childPid = -5;
+	childPid = fork();
+
+	if(childPid == -1){
+
+		perror("fork");
+		exit(EXIT_FAILURE);
+
+	}
+
+	else if(childPid == 0){
+
+		ctrlC.sa_handler = SIG_DFL;
+		sigaction(SIGINT, &ctrlC, NULL);
+		
+		if(strcmp(cmdIn, "")){
+
+			userInt = open(cmdIn, O_RDONLY);
+
+			if(userInt == -1){
+
+				perror("Cannot open file for input\n");
+				exit(EXIT_FAILURE);
+
+			}
+			assign = dup2(userInt, 0);
+			if(assign == -1){
+
+				perror("Cannot open file for input\n");
+                exit(EXIT_FAILURE);
+
+			}
+			fcntl(userInt, F_SETFD, FD_CLOEXEC);
+
+		}
+
+		if(strcmp(cmdOut, "")){
+
+			userOut = open(cmdOut, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			
+			if(userOut == -1){
+
+				perror("Cannot open file for output\n");
+				exit(EXIT_FAILURE);
+
+			}
+			assign = dup2(userOut, 1);
+			if(assign == -1){
+
+				perror("Cannot open file for output\n");
+                exit(EXIT_FAILURE);
+
+			}
+			fcntl(userOut, F_SETFD, FD_CLOEXEC);
+
+		}
+
+		if(execvp(useCmd[0], (char* const*)useCmd)){
+
+			printf("%s: no such file or directory\n", useCmd[0]);
+			fflush(stdout);
+			exit(EXIT_FAILURE);
+
+		}
+		//break;
+
+	}
+	else{
+
+		if(*bg && foreground){
+
+			pid_t nextPid;
+			nextPid = waitpid(childPid, cStat, WNOHANG);
+			printf("background pid is %d\n", childPid);
+			fflush(stdout);
+
+		}
+		else{
+
+			pid_t nextPid;
+			nextPid = waitpid(childPid, cStat, 0);
+
+		}
+
+	}
+	while((childPid = waitpid(-1, cStat, WNOHANG)) > 0){
+
+		printf("child %d terminated\n", childPid);
+		fore_pro(*cStat);
+		fflush(stdout);
+
+	}
+
+}
+
 int main(int argc, char ** argv){
 
 	int repeat = 1;
 	int processes = 0;
 	char status[MAX] = "No processes";
+	char user_str[256] = "";
+	char user_res[256] = "";
+	char* user_cmd[MAX_CHARS];
 	pid_t list[100];
 
 	struct sigaction ignore_event = {0};
@@ -247,8 +350,8 @@ int main(int argc, char ** argv){
 	sigaction(SIGTSTP, &signal_event, NULL);
 
 //	signal_event.sa_handler = SIG_DFL;
-	pid_t childPid = -5;
-	childPid = fork();
+//	pid_t childPid = -5;
+//	childPid = fork();
 	int exit_pro = 0;
 
 
@@ -353,7 +456,7 @@ int main(int argc, char ** argv){
 			}
 
 		}
-		else if(strncmp(newargv[0], "status", 6) == 0){
+		else if(strcmp(newargv[0], "status") == 0){
 
 	//		repeat = 1;
 	//		printf("%s\n", status);
@@ -363,8 +466,8 @@ int main(int argc, char ** argv){
 		}
 		else{
 
-
-			if(childPid == 0){
+			other(&exit_pro, &processes, signal_event, user_cmd, user_str, user_res);			
+/*			if(childPid == 0){
 
 			//	if(!object->last){
 				signal_event.sa_handler = SIG_DFL;
@@ -405,7 +508,7 @@ int main(int argc, char ** argv){
 				fore_pro(exit_pro);
 				fflush(stdout);
 
-			}
+			}*/
 
 		}
 		free(line);
