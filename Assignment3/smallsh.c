@@ -225,6 +225,68 @@ void fore_pro2(int event){
 
 }
 
+void control(int* bg, int userP, char* useCmd[], char cmdIn[], char cmdOut[]){
+
+	char len[MAX];
+
+	printf(": ");
+	fflush(stdout);
+	fgets(len, MAX, stdin);
+	int new = 0;
+	int i;
+
+	for(i = 0; i < MAX && !new; i++){
+
+		if(len[i] == '\n'){
+
+			len[i] == '\0';
+			new = 1;
+
+		}
+
+	}
+	const char spread[2] = " ";
+	char *tokens = strtok(len, spread);
+
+	for(i = 0; tokens; i++){
+		if(strcmp(tokens, "&") == 0){
+
+			*bg = 1;
+
+		}
+
+		else if(strcmp(tokens, ">") == 0){
+
+			tokens = strtok(NULL, spread);
+			strcpy(cmdOut, tokens);
+
+		}
+		else if(strcmp(tokens, "<") == 0){
+
+			tokens = strtok(NULL, spread);
+			strcpy(cmdIn, tokens);
+
+		}
+		else{
+
+			useCmd[i] = strdup(tokens);
+
+			for(int j = 0; useCmd[i][j]; j++){
+
+				if(useCmd[i][j] == '$' && useCmd[i][j + 1] == '$'){
+
+					useCmd[i][j] = '\0';
+					snprintf(useCmd[i], 256, "%s%d", useCmd[i], userP);
+
+				}
+
+			}
+
+		}
+		tokens = strtok(NULL, spread);
+	}
+}
+
 void other(int* cStat, int* bg,struct sigaction ctrlC, char* useCmd[], char cmdIn[], char cmdOut[]){
 
 	int userInt;
@@ -334,6 +396,7 @@ int main(int argc, char ** argv){
 	char user_res[256] = "";
 	char* user_cmd[MAX_CHARS];
 	pid_t list[100];
+	int user_p = getpid();
 
 	struct sigaction ignore_event = {0};
 	ignore_event.sa_handler = SIG_IGN;
@@ -387,10 +450,12 @@ int main(int argc, char ** argv){
 			}
 
 		}
-		printf(": ");	
 
-		line = read_line();
-		newargv = split_line(line, object);
+		control(&processes, user_p, user_cmd, user_str, user_res);
+//		printf(": ");	
+
+//		line = read_line();
+//		newargv = split_line(line, object);
 
 		if(object->argc == 0 || newargv[0] == NULL){
 
