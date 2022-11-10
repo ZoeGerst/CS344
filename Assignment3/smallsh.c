@@ -17,6 +17,7 @@
 
 #define MAX 2048
 #define MAX_CHARS 512
+int foreground = 1;
 
 struct command{
 
@@ -131,6 +132,7 @@ void smallsh_launch(char **args, struct command *object){
 			exit(EXIT_FAILURE);
 
 		}
+		fcntl(file_des_in, F_SETFD, FD_CLOEXEC);
 
 	}
 
@@ -150,6 +152,7 @@ void smallsh_launch(char **args, struct command *object){
 			exit(EXIT_FAILURE);
 
 		}
+		fcntl(file_des_in, F_SETFD, FD_CLOEXEC);
 
 	}
 
@@ -170,19 +173,21 @@ void smallsh_launch(char **args, struct command *object){
 			exit(EXIT_FAILURE);
 
 		}
+		fcntl(file_des_out, F_SETFD, FD_CLOEXEC);
 
 	}
 
-	execvp(args[0], args);
-	printf("%s: no such file or directory\n", args[0]);
-	exit(EXIT_FAILURE);
+	if(execvp(args[0], args)){
+		printf("%s: no such file or directory\n", args[0]);
+		exit(EXIT_FAILURE);
+	}
 }
 
 
-void fore_pro(pid_t wpid, char *term){
+void fore_pro(int position){
 
-	int position;
-	waitpid(wpid, &position, 0);
+	//int position;
+	//waitpid(wpid, &position, 0);
 
 	if(WIFEXITED(position)){
 
@@ -192,14 +197,33 @@ void fore_pro(pid_t wpid, char *term){
 	if(WIFSIGNALED(position)){
 
 		printf("terminated by signal %d", WTERMSIG(position));
-		printf("%s\n", term);
-		fflush(stdout);
+	//	printf("%s\n", term);
+	//	fflush(stdout);
 
 	}
 
 }
 
+void fore_pro2(int event){
 
+	if(foreground == 1){
+
+		char* ent_exit = "Entering foreground-only mode (& is now ignored)\n";
+		write(STDOUT_FILENO, ent_exit, SIGRTMIN + 24);
+		fflush(stdin);
+		foreground = 0;
+
+	}
+	else{
+
+		char* ent_exit = "Exiting foreground-only mode\n";
+		write(1, ent_exit, SIGRTMIN - 4);
+//		fflush(stdout);
+		foreground = 1;
+
+	}
+
+}
 
 int main(int argc, char ** argv){
 
@@ -207,12 +231,25 @@ int main(int argc, char ** argv){
 	int processes = 0;
 	char status[MAX] = "No processes";
 	pid_t list[100];
-	struct sigaction signal_event;
-	struct sigaction ignore_event;
-	signal_event.sa_handler = SIG_DFL;
+
+	struct sigaction ignore_event = {0};
 	ignore_event.sa_handler = SIG_IGN;
+	sigfillset(&ignore_event.sa_mask);
+	ignore_event.sa_flags = 0;
 	sigaction(SIGINT, &ignore_event, NULL);
-	pid_t childPid = fork();
+	
+
+
+	struct sigaction signal_event = {0};
+	signal_event.sa_handler = fore_pro2;
+	sigfillset(&signal_event.sa_mask);
+	signal_event.sa_flags = 0;
+	sigaction(SIGTSTP, &signal_event, NULL);
+
+//	signal_event.sa_handler = SIG_DFL;
+	pid_t childPid = -5;
+	childPid = fork();
+	int exit_pro = 0;
 
 
 	do{
@@ -247,8 +284,8 @@ int main(int argc, char ** argv){
 			}
 
 		}
-
 		printf(": ");	
+
 		line = read_line();
 		newargv = split_line(line, object);
 
@@ -321,7 +358,7 @@ int main(int argc, char ** argv){
 	//		repeat = 1;
 	//		printf("%s\n", status);
 	//		fflush(stdout);
-			fore_pro(childPid, status);
+			fore_pro(exit_pro);
 
 		}
 		else{
@@ -329,11 +366,11 @@ int main(int argc, char ** argv){
 
 			if(childPid == 0){
 
-				if(!object->last){
+			//	if(!object->last){
+				signal_event.sa_handler = SIG_DFL;
+				sigaction(SIGINT, &signal_event, NULL);
 
-					sigaction(SIGINT, &signal_event, NULL);
-
-				}
+			//	}
 				smallsh_launch(newargv, object);
 
 			}
@@ -345,19 +382,28 @@ int main(int argc, char ** argv){
 			}
 			else{
 
-				if(object->last){
+				if(object->last && foreground){
 
-					list[processes] = childPid;
-					processes++;
+					//list[processes] = childPid;
+					//processes++;
+					pid_t nextPid = waitpid(childPid, &exit_pro, WNOHANG);
 					printf("background pid is %d\n", childPid);
 					fflush(stdout);
 
 				}
-		/*		else{
+				else{
 
-					fore_pro(childPid, status);
+					pid_t nextPid;
+					nextPid = waitpid(childPid, &exit_pro, 0);
 
-				}*/
+				}
+
+			}
+			while((childPid = waitpid(-1, &exit_pro, WNOHANG)) > 0){
+
+				printf("child %d terminated\n", childPid);
+				fore_pro(exit_pro);
+				fflush(stdout);
 
 			}
 
