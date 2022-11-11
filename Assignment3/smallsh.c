@@ -32,13 +32,15 @@ struct command{
 
 char *read_line(){
 
-	char *line = NULL;
-	ssize_t bufsize = MAX_CHARS;
-	getline(&line, &bufsize, stdin);
+	char *line;
+	size_t bufsize = MAX_CHARS;
+	//line = malloc(bufsize);
+	fgets(line, MAX_CHARS, stdin);
+	printf("test read line");
 	return line;
 
 }
-
+/*
 #define SMALLSH_TOK_DELIM " \t\r\n\a"
 char **split_line(char *line, struct command *object){
 
@@ -182,7 +184,7 @@ void smallsh_launch(char **args, struct command *object){
 		exit(EXIT_FAILURE);
 	}
 }
-
+*/
 
 void fore_pro(int position){
 
@@ -208,7 +210,7 @@ void fore_pro2(int event){
 
 	if(foreground == 1){
 
-		char* ent_exit = "Entering foreground-only mode (& is now ignored)\n";
+		char* ent_exit = "\nEntering foreground-only mode (& is now ignored)\n";
 		write(STDOUT_FILENO, ent_exit, SIGRTMIN + 24);
 		fflush(stdin);
 		foreground = 0;
@@ -216,7 +218,7 @@ void fore_pro2(int event){
 	}
 	else{
 
-		char* ent_exit = "Exiting foreground-only mode\n";
+		char* ent_exit = "\nExiting foreground-only mode\n";
 		write(1, ent_exit, SIGRTMIN - 4);
 //		fflush(stdout);
 		foreground = 1;
@@ -225,17 +227,20 @@ void fore_pro2(int event){
 
 }
 
-void control(int* bg, int userP, char* useCmd[], char cmdIn[], char cmdOut[]){
+void control(char* useCmd[], int* bg, char cmdIn[], char cmdOut[], int userP){
 
 	char len[MAX];
 
 	printf(": ");
 	fflush(stdout);
 	fgets(len, MAX, stdin);
+	//len = read_line();
+	//printf("test read line");
+//	getline(len, MAX, stdin);
 	int new = 0;
 	int i;
 
-	for(i = 0; i < MAX && !new; i++){
+	for(i = 0; !new && i < MAX; i++){
 
 		if(len[i] == '\n'){
 
@@ -243,6 +248,13 @@ void control(int* bg, int userP, char* useCmd[], char cmdIn[], char cmdOut[]){
 			new = 1;
 
 		}
+	//	scanf("%s", len[i]);
+
+	}
+	if(!strcmp(len, "")){
+
+		useCmd[0] = strdup("");
+		return;
 
 	}
 	const char spread[2] = " ";
@@ -287,7 +299,7 @@ void control(int* bg, int userP, char* useCmd[], char cmdIn[], char cmdOut[]){
 	}
 }
 
-void other(int* cStat, int* bg,struct sigaction ctrlC, char* useCmd[], char cmdIn[], char cmdOut[]){
+void other(char* useCmd[], int* cStat, struct sigaction ctrlC, int* bg, char cmdIn[], char cmdOut[]){
 
 	int userInt;
 	int userOut;
@@ -299,6 +311,7 @@ void other(int* cStat, int* bg,struct sigaction ctrlC, char* useCmd[], char cmdI
 
 		perror("fork");
 		exit(EXIT_FAILURE);
+		//break;
 
 	}
 
@@ -314,14 +327,14 @@ void other(int* cStat, int* bg,struct sigaction ctrlC, char* useCmd[], char cmdI
 			if(userInt == -1){
 
 				perror("Cannot open file for input\n");
-				exit(EXIT_FAILURE);
+				exit(1);
 
 			}
 			assign = dup2(userInt, 0);
 			if(assign == -1){
 
 				perror("Cannot open file for input\n");
-                exit(EXIT_FAILURE);
+                exit(2);
 
 			}
 			fcntl(userInt, F_SETFD, FD_CLOEXEC);
@@ -329,6 +342,8 @@ void other(int* cStat, int* bg,struct sigaction ctrlC, char* useCmd[], char cmdI
 		}
 
 		if(strcmp(cmdOut, "")){
+
+			
 
 			userOut = open(cmdOut, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			
@@ -349,11 +364,11 @@ void other(int* cStat, int* bg,struct sigaction ctrlC, char* useCmd[], char cmdI
 
 		}
 
-		if(execvp(useCmd[0], (char* const*)useCmd)){
+		if(execvp(useCmd[0], useCmd) == -1){
 
 			printf("%s: no such file or directory\n", useCmd[0]);
 			fflush(stdout);
-			exit(EXIT_FAILURE);
+			exit(1);
 
 		}
 		//break;
@@ -390,13 +405,20 @@ void other(int* cStat, int* bg,struct sigaction ctrlC, char* useCmd[], char cmdI
 int main(int argc, char ** argv){
 
 	int repeat = 1;
-	int processes = 0;
+    int processes = 0;
+	int exit_pro = 0;	
 	char status[MAX] = "No processes";
 	char user_str[256] = "";
 	char user_res[256] = "";
 	char* user_cmd[MAX_CHARS];
 	pid_t list[100];
 	int user_p = getpid();
+	int i;
+	for(i = 0; i < MAX_CHARS; i++){
+
+		user_cmd[i] = NULL;
+
+	}	
 
 	struct sigaction ignore_event = {0};
 	ignore_event.sa_handler = SIG_IGN;
@@ -415,7 +437,6 @@ int main(int argc, char ** argv){
 //	signal_event.sa_handler = SIG_DFL;
 //	pid_t childPid = -5;
 //	childPid = fork();
-	int exit_pro = 0;
 
 
 	do{
@@ -451,24 +472,24 @@ int main(int argc, char ** argv){
 
 		}
 
-		control(&processes, user_p, user_cmd, user_str, user_res);
+		control(user_cmd, &processes, user_str, user_res, user_p);
 //		printf(": ");	
-
 //		line = read_line();
+
 //		newargv = split_line(line, object);
 
-		if(object->argc == 0 || newargv[0] == NULL){
+		if(user_cmd[0][0] == '\0'){
 
 			repeat = 1;
 		
 		}
-		else if(strncmp(newargv[0], "#", 1) == 0){
+		else if(strncmp(user_cmd[0], "#", 1) == 0){
 
 			//printf("Test #\n");
 			repeat = 1;
 
 		}
-		else if(strcmp(newargv[0], "exit") == 0){
+		else if(strcmp(user_cmd[0], "exit") == 0){
 
 /*			if(object->argc > 2){
 
@@ -488,7 +509,7 @@ int main(int argc, char ** argv){
 			repeat = 0;
 			fflush(stdout);
 	
-			for(int i = 0; i < processes; i++){
+			for(i = 0; i < processes; i++){
 
 				kill(list[processes], SIGTERM);
 
@@ -497,19 +518,21 @@ int main(int argc, char ** argv){
 			}
 
 		}
-		else if(strcmp(newargv[0], "cd") == 0){
+		else if(strcmp(user_cmd[0], "cd") == 0){
 
-			if(object->argc > 2){
+		/*	if(user_cmd > 2){
 
 				printf("unexpected argument\n");
+				fflush(stdout);
 
-			}
+			}*/
 
-			if(newargv[1]){
+			if(user_cmd[1]){
 
-				if(chdir(newargv[1]) != 0){
+				if(chdir(user_cmd[1]) == -1){
 
-					printf("%s: no such file or directory\n", newargv[1]);
+					printf("%s: no such file or directory\n", user_cmd[1]);
+					fflush(stdout);
 
 				}
 
@@ -521,7 +544,7 @@ int main(int argc, char ** argv){
 			}
 
 		}
-		else if(strcmp(newargv[0], "status") == 0){
+		else if(strcmp(user_cmd[0], "status") == 0){
 
 	//		repeat = 1;
 	//		printf("%s\n", status);
@@ -531,7 +554,7 @@ int main(int argc, char ** argv){
 		}
 		else{
 
-			other(&exit_pro, &processes, signal_event, user_cmd, user_str, user_res);			
+			other(user_cmd, &exit_pro, signal_event, &processes, user_str, user_res);			
 /*			if(childPid == 0){
 
 			//	if(!object->last){
@@ -576,9 +599,17 @@ int main(int argc, char ** argv){
 			}*/
 
 		}
+		for(i = 0; user_cmd[i]; i++){
+
+			user_cmd[i] = NULL;
+
+		}
 		free(line);
 		free(object);
 		free(newargv);
+		processes = 0;
+		user_str[0] = '\0';
+		user_res[0] = '\0';
 		
 
 	}
