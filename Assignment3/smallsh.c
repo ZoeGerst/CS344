@@ -4,6 +4,10 @@
 //CS344
 //Works Cited:
 //https://brennan.io/2015/01/16/write-a-shell-in-c/
+// https://www.geeksforgeeks.org/introduction-linux-shell-shell-scripting/
+// https://www.geeksforgeeks.org/fgets-gets-c-language/
+// https://stackoverflow.com/questions/47317781/using-strtok-to-store-numeric-values-in-a-2d-array
+// https://www.tutorialspoint.com/cprogramming/switch_statement_in_c.htm
 
 
 #include <sys/stat.h>
@@ -19,228 +23,40 @@
 #define MAX_CHARS 512
 int foreground = 1;
 
-struct command{
-
-	int argc;
-	int last;
-	int move_in;
-	int move_out;
-	char *in;
-	char *out;
-
-};
-
-char *read_line(){
-
-	char *line;
-	size_t bufsize = MAX_CHARS;
-	//line = malloc(bufsize);
-	fgets(line, MAX_CHARS, stdin);
-	printf("test read line");
-	return line;
-
-}
-/*
-#define SMALLSH_TOK_DELIM " \t\r\n\a"
-char **split_line(char *line, struct command *object){
-
-	int bufsize = MAX, position = 1;
-	char **tokens = malloc(bufsize * sizeof(char *));
-	char *token;
-	object->last = 0;
-	object->move_in = 0;
-	object->move_out = 0;
-	object->argc = 0;
-//	object->in = 1;
-
-	if(!tokens){
-
-		fprintf(stderr, "Allocation Error\n");
-    	exit(EXIT_FAILURE);
-
-	}
-
-	token = strtok(line, SMALLSH_TOK_DELIM);
-	while(token != NULL && position != 0){
-
-		if(strcmp(token, "&") == 0){
-
-			object->last = 1;
-			position = 0;
-
-		}
-
-		else if(strcmp(token, "<") == 0){
-
-			object->move_in = 1;
-			position = 2;
-
-		}
-
-		else if(strcmp(token, ">") == 0){
-
-			object->move_out = 1;
-			position = 3;
-
-		}
-		else{
-
-			if(position == 2){
-
-				object->in = token;
-
-			}
-			else if(position == 3){
-
-				object->out = token;
-
-			}
-			else{
-
-				tokens[object->argc] = token;
-				object->argc++;
-				tokens[object->argc] = NULL;
-
-			}
-
-		}
-
-		token = strtok(NULL, SMALLSH_TOK_DELIM);
-	}
-
-	return tokens;
-}
-
-void smallsh_launch(char **args, struct command *object){
-
-	int file_des_in;
-	int file_des_out;
-	char name[MAX] = "";
-
-	if(object->move_in){
-
-		file_des_in = open(object->in, O_RDONLY);
-
-		if(file_des_in == -1){
-
-			printf("Cannot open file for input\n", object->in);
-			exit(EXIT_FAILURE);
-
-		}
-
-		if(dup2(file_des_in, 0) == -1){
-
-			printf("Cannot open file for input\n", object->in);
-			exit(EXIT_FAILURE);
-
-		}
-		fcntl(file_des_in, F_SETFD, FD_CLOEXEC);
-
-	}
-
-	else if(object->last){
-
-		file_des_in == open("/dev/null", O_RDONLY);
-
-		if(file_des_in == -1){
-
-			printf("Cannot open file for input\n");
-			exit(EXIT_FAILURE);
-
-		}
-		if(dup2(file_des_in, 0) == -1){
-
-			printf("Cannot open file for input\n");
-			exit(EXIT_FAILURE);
-
-		}
-		fcntl(file_des_in, F_SETFD, FD_CLOEXEC);
-
-	}
-
-	if(object->move_out){
-
-		file_des_out = open(object->out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-
-		if(file_des_out == -1){
-
-			printf("Cannot open file for output\n", object->out);
-			exit(EXIT_FAILURE);
-
-		}
-
-		if(dup2(file_des_out, 1) == -1){
-
-			printf("Cannot open file for output\n", object->out);
-			exit(EXIT_FAILURE);
-
-		}
-		fcntl(file_des_out, F_SETFD, FD_CLOEXEC);
-
-	}
-
-	if(execvp(args[0], args)){
-		printf("%s: no such file or directory\n", args[0]);
-		exit(EXIT_FAILURE);
-	}
-}
-*/
-
+//exit status
 void fore_pro(int position){
 
-	//int position;
-	//waitpid(wpid, &position, 0);
-
+	//if status exits it
 	if(WIFEXITED(position)){
 
 		printf("exit value %d\n", WEXITSTATUS(position));
 
 	}
+	//terminted signal
 	if(WIFSIGNALED(position)){
 
-		printf("terminated by signal %d", WTERMSIG(position));
-	//	printf("%s\n", term);
-	//	fflush(stdout);
-
+		printf("terminated by signal %d\n", WTERMSIG(position));
 	}
-
 }
-
-void fore_pro2(int event){
-
-	if(foreground == 1){
-
-		char* ent_exit = "\nEntering foreground-only mode (& is now ignored)\n";
-		write(STDOUT_FILENO, ent_exit, SIGRTMIN + 24);
-		fflush(stdin);
-		foreground = 0;
-
-	}
-	else{
-
-		char* ent_exit = "\nExiting foreground-only mode\n";
-		write(1, ent_exit, SIGRTMIN - 4);
-//		fflush(stdout);
-		foreground = 1;
-
-	}
-
-}
-
-void control(char* useCmd[], int* bg, char cmdIn[], char cmdOut[], int userP){
+/*
+//get the user input
+int split_line(char* useCmd[], int* bg, char cmdIn[], char cmdOut[], int userP){
 
 	char len[MAX];
 
 	printf(": ");
 	fflush(stdout);
 	fgets(len, MAX, stdin);
-	//len = read_line();
-	//printf("test read line");
-//	getline(len, MAX, stdin);
+	//keeps blank
+	len[strlen(len) - 1] = '\0';
+
 	int new = 0;
 	int i;
+	int check_in = 0;
+	int check_out = 0;
 
-	for(i = 0; !new && i < MAX; i++){
+	//makes sure there's no more blanks
+	for(i = 0; i < MAX; i++){
 
 		if(len[i] == '\n'){
 
@@ -248,45 +64,74 @@ void control(char* useCmd[], int* bg, char cmdIn[], char cmdOut[], int userP){
 			new = 1;
 
 		}
-	//	scanf("%s", len[i]);
-
 	}
 	if(!strcmp(len, "")){
 
 		useCmd[0] = strdup("");
-		return;
+		return 0;
 
 	}
+
+	
 	const char spread[2] = " ";
 	char *tokens = strtok(len, spread);
 
+	//reads each string
 	for(i = 0; tokens; i++){
 		if(strcmp(tokens, "&") == 0){
 
 			*bg = 1;
 
 		}
+	
+		//checks for input file
+		else if(check_in == 1){
 
-		else if(strcmp(tokens, ">") == 0){
-
-			tokens = strtok(NULL, spread);
-			strcpy(cmdOut, tokens);
+			cmdOut = strdup(tokens);
+			check_in = 0;
+//			printf("test cmdin %s\n", cmdIn);
 
 		}
+
+		//checks for input file
+		else if(check_out == 1){
+
+		//	tokens = strtok(NULL, spread);
+			cmdOut = strdup(tokens);
+		//	strcpy(cmdOut, tokens);
+			check_out = 0;
+			//printf("test cmdout %s\n", cmdOut);
+
+		}
+
+		//checks for > in user input
+		else if(strcmp(tokens, ">") == 0){
+
+		//	tokens = strtok(NULL, spread);
+		//	cmdOut = strdup(tokens);
+		//	strcpy(cmdOut, tokens);
+			check_out = 1;
+
+		}
+
+		//checks for < in user input
 		else if(strcmp(tokens, "<") == 0){
 
-			tokens = strtok(NULL, spread);
-			strcpy(cmdIn, tokens);
+		//	tokens = strtok(NULL, spread);
+		//	strcpy(cmdIn, tokens);
+			check_in = 1;
 
 		}
 		else{
 
 			useCmd[i] = strdup(tokens);
 
+			//checks for $ at the end of the user's input
 			for(int j = 0; useCmd[i][j]; j++){
 
-				if(useCmd[i][j] == '$' && useCmd[i][j + 1] == '$'){
+				if(useCmd[i][j] == '$'){
 
+					//replaces with pid
 					useCmd[i][j] = '\0';
 					snprintf(useCmd[i], 256, "%s%d", useCmd[i], userP);
 
@@ -297,129 +142,208 @@ void control(char* useCmd[], int* bg, char cmdIn[], char cmdOut[], int userP){
 		}
 		tokens = strtok(NULL, spread);
 	}
-}
+	for(int x = 0; x < 5; x++){
 
-void other(char* useCmd[], int* cStat, struct sigaction ctrlC, int* bg, char cmdIn[], char cmdOut[]){
+		printf("%s\n", useCmd[x]);
 
+	}
+
+	return i;
+}*/
+
+//tests other commands
+void smallsh_launch(char* useCmd[], int* cStat, struct sigaction ctrlC, int* bg, char *cmdIn, char *cmdOut){
+
+//	printf("top of function \n");
+//	
+//	printf("in %s\n", cmdIn);
+//	 printf("out %s\n", cmdOut);		
 	int userInt;
 	int userOut;
 	int assign;
 	pid_t childPid = -5;
 	childPid = fork();
 
-	if(childPid == -1){
+	//execvp(cmdIn, useCmd);
 
-		perror("fork");
-		exit(EXIT_FAILURE);
-		//break;
+//	printf("before switch %s\n", useCmd[0]);
 
-	}
+	switch (childPid){
 
-	else if(childPid == 0){
+//	if(childPid == -1){
+//
+		case -1: 
 
-		ctrlC.sa_handler = SIG_DFL;
-		sigaction(SIGINT, &ctrlC, NULL);
-		
-		if(strcmp(cmdIn, "")){
+			perror("fork");
+			exit(EXIT_FAILURE);
+			break;
+	//	}
 
-			userInt = open(cmdIn, O_RDONLY);
+//	else if(childPid == 0){
+	
+		case 0:
+		//	printf("Beginning of case 0 %s\n", useCmd[0]);
 
-			if(userInt == -1){
+			ctrlC.sa_handler = SIG_DFL;
+			sigaction(SIGINT, &ctrlC, NULL);
 
-				perror("Cannot open file for input\n");
-				exit(1);
-
-			}
-			assign = dup2(userInt, 0);
-			if(assign == -1){
-
-				perror("Cannot open file for input\n");
-                exit(2);
-
-			}
-			fcntl(userInt, F_SETFD, FD_CLOEXEC);
-
-		}
-
-		if(strcmp(cmdOut, "")){
-
+			//printf("test cmdIn %s\n", cmdIn);
+//			printf("In %s\n", *cmdIn);
+//			printf("Out %s\n", *cmdOut);
 			
 
-			userOut = open(cmdOut, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			//checks the input file
+			if(strcmp(cmdIn, "*") != 0){
+
+				userInt = open(cmdIn, O_RDONLY);
+
+				if(userInt == -1){
+
+			//	printf("test input\n");
+					perror("Cannot open file for input\n");
+					exit(1);
+
+				}
+				assign = dup2(userInt, 0);
+				if(assign == -1){
+
+					perror("Cannot open file for input\n");
+               		exit(2);
+
+				}
+				//printf("%s\n", useCmd[0]);
+				fcntl(userInt, F_SETFD, FD_CLOEXEC);
+
+			}
+
+			//handles output file
+			if(strcmp(cmdOut, "*") != 0){
+
+				
+
+				userOut = open(cmdOut, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			
-			if(userOut == -1){
+				if(userOut == -1){
 
-				perror("Cannot open file for output\n");
-				exit(EXIT_FAILURE);
+					perror("Cannot open file for output\n");
+					exit(EXIT_FAILURE);
+
+				}
+				//assigns duplicate
+				assign = dup2(userOut, 1);
+				if(assign == -1){
+
+					perror("Cannot open file for output\n");
+                	exit(EXIT_FAILURE);
+
+				}
+				fcntl(userOut, F_SETFD, FD_CLOEXEC);
 
 			}
-			assign = dup2(userOut, 1);
-			if(assign == -1){
 
-				perror("Cannot open file for output\n");
-                exit(EXIT_FAILURE);
+			//if file/directory doesn't exist
+			if(execvp(useCmd[0], useCmd) < 0){
+
+//				printf("in exec[0]  %s\n", useCmd[1]);
+//				printf("in exec %s\n", useCmd);
+				printf("%s: no such file or directory\n", useCmd[0]);
+				fflush(stdout);
+				exit(2);
 
 			}
-			fcntl(userOut, F_SETFD, FD_CLOEXEC);
+			break;
+	//}
+	//else{
+		default:
 
-		}
+			//background process
+			if(*bg && foreground){
 
-		if(execvp(useCmd[0], useCmd) == -1){
+				pid_t nextPid;
+				nextPid = waitpid(childPid, cStat, WNOHANG);
+				printf("background pid is %d\n", childPid);
+				fflush(stdout);
 
-			printf("%s: no such file or directory\n", useCmd[0]);
+				}
+			else{
+
+				pid_t nextPid;
+				nextPid = waitpid(childPid, cStat, 0);
+
+			}
+
+//	}
+		//terminates child process
+		while((childPid = waitpid(-1, cStat, WNOHANG)) > 0){
+
+			printf("child %d terminated\n", childPid);
+			fore_pro(*cStat);
 			fflush(stdout);
-			exit(1);
 
 		}
-		//break;
+	}
+
+}
+/*
+void fore_pro(int position){
+
+	if(WIFEXITED(position)){
+
+		printf("exit value %d\n", WEXITSTATUS(position));
 
 	}
+	if(WIFSIGNALED(position)){
+
+		printf("terminated by signal %d", WTERMSIG(position));
+	}
+}
+*/
+
+//checks to see if in foreground process
+void fore_pro2(int event){
+
+	//^C^Z
+	if(foreground == 1){
+
+		char* ent_exit = "\nEntering foreground-only mode (& is now ignored)\n";
+		write(STDOUT_FILENO, ent_exit, SIGRTMIN + 24);
+		fflush(stdin);
+		foreground = 0;
+
+	}
+
+	//^Z
 	else{
 
-		if(*bg && foreground){
-
-			pid_t nextPid;
-			nextPid = waitpid(childPid, cStat, WNOHANG);
-			printf("background pid is %d\n", childPid);
-			fflush(stdout);
-
-		}
-		else{
-
-			pid_t nextPid;
-			nextPid = waitpid(childPid, cStat, 0);
-
-		}
-
-	}
-	while((childPid = waitpid(-1, cStat, WNOHANG)) > 0){
-
-		printf("child %d terminated\n", childPid);
-		fore_pro(*cStat);
-		fflush(stdout);
+		char* ent_exit = "\nExiting foreground-only mode\n";
+		write(1, ent_exit, SIGRTMIN - 4);
+		foreground = 1;
 
 	}
 
 }
 
-int main(int argc, char ** argv){
+int main(){
 
 	int repeat = 1;
     int processes = 0;
-	int exit_pro = 0;	
-	char status[MAX] = "No processes";
-	char user_str[256] = "";
-	char user_res[256] = "";
+	int exit_pro = 0;
+
+	//char* user_str = "*";
+	//char* user_res = "*";
 	char* user_cmd[MAX_CHARS];
-	pid_t list[100];
+
 	int user_p = getpid();
 	int i;
+
+	//checks each character
 	for(i = 0; i < MAX_CHARS; i++){
 
 		user_cmd[i] = NULL;
 
 	}	
 
+	//handles ^C
 	struct sigaction ignore_event = {0};
 	ignore_event.sa_handler = SIG_IGN;
 	sigfillset(&ignore_event.sa_mask);
@@ -427,27 +351,20 @@ int main(int argc, char ** argv){
 	sigaction(SIGINT, &ignore_event, NULL);
 	
 
-
+	//handles ^Z
 	struct sigaction signal_event = {0};
 	signal_event.sa_handler = fore_pro2;
 	sigfillset(&signal_event.sa_mask);
 	signal_event.sa_flags = 0;
 	sigaction(SIGTSTP, &signal_event, NULL);
 
-//	signal_event.sa_handler = SIG_DFL;
-//	pid_t childPid = -5;
-//	childPid = fork();
-
-
 	do{
 
-		struct command *object = malloc(sizeof(struct command));
-		object->last = 0;
-		object->move_in = 0;
-		object->move_out = 0;
-		object->argc = 0;
-		char *line;
-		char **newargv;
+		char* user_str = "*";
+		char* user_res = "*";
+	//	char* user_cmd[MAX_CHARS];
+
+		//Zombie Process
 		int zombie_status;
 		pid_t bgp;
 
@@ -455,7 +372,8 @@ int main(int argc, char ** argv){
 		bgp = waitpid(-1, &zombie_status, WNOHANG);
 
 		if(bgp > 0){
-			
+
+			//if pid is finished sending the signal			
 			if(WIFEXITED(zombie_status)){
 
 				printf("background pid %d is done: exit value %d\n", bgp, WEXITSTATUS(zombie_status));
@@ -463,6 +381,8 @@ int main(int argc, char ** argv){
 				fflush(stdout);
 
 			}
+
+			//if signal is terminated
 			else if(WIFSIGNALED(zombie_status)){
 
 				printf("background pid %d is done: terminated by signal %d\n", bgp, WTERMSIG(zombie_status));
@@ -472,63 +392,148 @@ int main(int argc, char ** argv){
 
 		}
 
-		control(user_cmd, &processes, user_str, user_res, user_p);
-//		printf(": ");	
-//		line = read_line();
 
-//		newargv = split_line(line, object);
+		//assign input to last
+		//int last = split_line(user_cmd, &processes, user_str, user_res, user_p);
 
-		if(user_cmd[0][0] == '\0'){
+		char len[MAX];
+
+		printf(": ");
+		fflush(stdin);
+		fgets(len, MAX, stdin);
+		//keeps blank
+		len[strlen(len) - 1] = '\0';
+
+		int new = 0;
+		int i;
+		int check_in = 0;
+		int check_out = 0;
+
+		//makes sure there's no more blanks
+	/*	for (i = 0; i < MAX; i++) {
+
+			if (len[i] == '\n') {
+
+				len[i] == '\0';
+				new = 1;
+
+			}
+		}
+		if (!strcmp(len, "")) {
+
+			user_cmd[0] = strdup("");
+	//		return 0;
+
+		}
+*/
+
+		const char spread[2] = " ";
+		char* tokens = strtok(len, spread);
+
+		//reads each string
+		for (i = 0; tokens; i++) {
+			if (strcmp(tokens, "&") == 0) {
+
+				processes = 1;
+
+			}
+
+			//checks for input file
+			else if (check_in == 1) {
+
+				user_str = strdup(tokens);
+				check_in = 0;
+				//			printf("test cmdin %s\n", cmdIn);
+
+			}
+
+			//checks for input file
+			else if (check_out == 1) {
+
+				//	tokens = strtok(NULL, spread);
+				user_res = strdup(tokens);
+				//	strcpy(cmdOut, tokens);
+				check_out = 0;
+				//printf("test cmdout %s\n", cmdOut);
+
+			}
+
+			//checks for > in user input
+			else if (strcmp(tokens, ">") == 0) {
+
+				//	tokens = strtok(NULL, spread);
+				//	cmdOut = strdup(tokens);
+				//	strcpy(cmdOut, tokens);
+				check_out = 1;
+
+			}
+
+			//checks for < in user input
+			else if (strcmp(tokens, "<") == 0) {
+
+				//	tokens = strtok(NULL, spread);
+				//	strcpy(cmdIn, tokens);
+				check_in = 1;
+
+			}
+			else {
+
+				user_cmd[i] = strdup(tokens);
+
+				//checks for $ at the end of the user's input
+				for (int j = 0; user_cmd[i][j]; j++) {
+
+					if (user_cmd[i][j] == '$') {
+
+						//replaces with pid
+						user_cmd[i][j] = '\0';
+						snprintf(user_cmd[i], 256, "%s%d", user_cmd[i], user_p);
+
+					}
+
+				}
+
+			}
+			tokens = strtok(NULL, spread);
+		}
+
+
+		//if the user doesn't enter anything
+		if(strlen(len) == 0){
 
 			repeat = 1;
 		
 		}
+
+		//let's user use the # for commenting
 		else if(strncmp(user_cmd[0], "#", 1) == 0){
 
-			//printf("Test #\n");
 			repeat = 1;
 
 		}
-		else if(strcmp(user_cmd[0], "exit") == 0){
 
-/*			if(object->argc > 2){
+		//ends program
+		else if(strncmp(user_cmd[0], "exit", 4) == 0){
 
-				printf("unexpected argument\n");
-				fflush(stdout);
-
-			}
-			else if(newargv[1]){
-
-				printf("unexpected argument\n");
-				fflush(stdout);
-
-			}
-			else{
-
-				printf("killing background processes\n");*/
+			//printf("exit\n");
 			repeat = 0;
 			fflush(stdout);
 	
-			for(i = 0; i < processes; i++){
+/*			for(i = 0; i < processes; i++){
 
 				kill(list[processes], SIGTERM);
 
-				//}
-
-			}
-
-		}
-		else if(strcmp(user_cmd[0], "cd") == 0){
-
-		/*	if(user_cmd > 2){
-
-				printf("unexpected argument\n");
-				fflush(stdout);
-
 			}*/
 
+		}
+
+		//allows user to change directories
+		else if(strncmp(user_cmd[0], "cd", 2) == 0){
+
+			//cd + name
 			if(user_cmd[1]){
 
+				//if cd + name doesn't exist
 				if(chdir(user_cmd[1]) == -1){
 
 					printf("%s: no such file or directory\n", user_cmd[1]);
@@ -537,6 +542,7 @@ int main(int argc, char ** argv){
 				}
 
 			}
+			//goes to home directory
 			else{
 
 				chdir(getenv("HOME"));
@@ -544,76 +550,43 @@ int main(int argc, char ** argv){
 			}
 
 		}
-		else if(strcmp(user_cmd[0], "status") == 0){
 
-	//		repeat = 1;
-	//		printf("%s\n", status);
-	//		fflush(stdout);
+		//checks status
+		else if(strncmp(user_cmd[0], "status", 6) == 0){
+
 			fore_pro(exit_pro);
 
 		}
+
+		//other input
 		else{
 
-			other(user_cmd, &exit_pro, signal_event, &processes, user_str, user_res);			
-/*			if(childPid == 0){
+//			printf("%s\n", *user_cmd);
+		//	printf("before other: %s\n", &user_cmd);
+			
+			user_cmd[i] = NULL;
 
-			//	if(!object->last){
-				signal_event.sa_handler = SIG_DFL;
-				sigaction(SIGINT, &signal_event, NULL);
-
-			//	}
-				smallsh_launch(newargv, object);
-
-			}
-			else if(childPid == -1){
-
-				perror("fork");
-				exit(EXIT_FAILURE);
-
-			}
-			else{
-
-				if(object->last && foreground){
-
-					//list[processes] = childPid;
-					//processes++;
-					pid_t nextPid = waitpid(childPid, &exit_pro, WNOHANG);
-					printf("background pid is %d\n", childPid);
-					fflush(stdout);
-
-				}
-				else{
-
-					pid_t nextPid;
-					nextPid = waitpid(childPid, &exit_pro, 0);
-
-				}
-
-			}
-			while((childPid = waitpid(-1, &exit_pro, WNOHANG)) > 0){
-
-				printf("child %d terminated\n", childPid);
-				fore_pro(exit_pro);
-				fflush(stdout);
-
-			}*/
+//			printf("before other: %s\n", user_cmd);
+	//		printf("Test user_ str %s", *user_str);
+	//		printf("Test user_ res %s", *user_res);
+//			printf("test before small\n");
+			smallsh_launch(user_cmd, &exit_pro, signal_event, &processes, user_str, user_res);
 
 		}
+
+		//cleans code
 		for(i = 0; user_cmd[i]; i++){
 
 			user_cmd[i] = NULL;
 
 		}
-		free(line);
-		free(object);
-		free(newargv);
-		processes = 0;
-		user_str[0] = '\0';
-		user_res[0] = '\0';
-		
+
+	//	processes = 0;
+	//	user_str[0] = '\0';
+	//	user_res[0] = '\0';
+
 
 	}
 	while(repeat);
-
 	return 0;
 }
