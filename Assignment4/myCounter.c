@@ -93,7 +93,7 @@ void *consumer(){
 
 	int value;
 
-	while(myCount < 10){
+	while(myCount < 9){
 
 		pthread_mutex_lock(&myMutex);
 
@@ -119,7 +119,7 @@ void *consumer(){
 
 		pthread_cond_signal(&myCond1);
 
-		printf("PRODUCER: signaling myCond1\n");
+		printf("CONSUMER: signaling myCond1\n");
 
 		counter++;
 	}
