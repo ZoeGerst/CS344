@@ -107,7 +107,11 @@ void *consumer(){
 
 		}
 
+		printf("myCount: %d -> ", myCount);
+
 		get_item();
+
+		printf("%d\n", myCount);
 
 		pthread_mutex_unlock(&myMutex);
 
