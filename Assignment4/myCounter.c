@@ -30,9 +30,9 @@ void put_item(int value){
 void get_item(){
 
 
-	buffer[myCount - 1] = -1;
+	buffer[myCount] = -1;
 
-	myCount--;
+	myCount++;
 
 //	printf("%d\n", myCount);
 
@@ -43,8 +43,9 @@ void get_item(){
 void *producer(){
 
 	int value = 0;
+	printf("CONSUMER THREAD CREATED\n");
 
-	while(counter < 10){
+	while(myCount < 10){
 
 		pthread_mutex_lock(&myMutex);
 
@@ -57,8 +58,18 @@ void *producer(){
 			printf("PRODUCER: waiting on myCond1\n");
 
 		}
+		printf("myCount: %d -> ", myCount);
 
 		put_item(value);
+
+		printf("%d\n", myCount);
+
+		//if(myCount == 10){
+
+		//	return 0;
+
+		//}
+//		myCount++;
 
 //		myCount++;
 
@@ -81,9 +92,8 @@ void *producer(){
 void *consumer(){
 
 	int value;
-	printf("CONSUMER THREAD CREATED\n");
 
-	while(counter < 10){
+	while(myCount < 10){
 
 		pthread_mutex_lock(&myMutex);
 
@@ -137,11 +147,11 @@ int main(){
 	pthread_join(PRO[0], NULL);
 	pthread_join(PRO[1], NULL);
 
-/*	if(counter == 10){
+	//if(myCount == 10){
 
-		return 0;
+	//	return 0;
 
-	}*/
+	//}
 
 	printf("PROGRAM END\n");
 
