@@ -93,7 +93,7 @@ void *consumer(){
 
 	int value;
 
-	while(myCount < 9){
+	while(myCount < 8){
 
 		pthread_mutex_lock(&myMutex);
 
