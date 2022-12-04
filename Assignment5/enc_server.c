@@ -1,3 +1,6 @@
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,6 +8,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+
+#define SIZE 150000
 
 // Error function used for reporting issues
 void error(const char *msg) {
@@ -25,6 +30,47 @@ void setupAddressStruct(struct sockaddr_in* address,
   address->sin_port = htons(portNumber);
   // Allow a client at any address to connect to this server
   address->sin_addr.s_addr = INADDR_ANY;
+}
+
+void encryption(int connectionSocket, char* buffer, char* finalKey){
+
+	int firstWord;
+	int secondWord;
+	int encryptSum = 0;
+	char alpha[] = "ABCDEFGHIJKLMNOPQRUSTUVWXYZ ";
+	int charWritten;
+	
+
+	for(int i = 0; i < strlen(buffer); i++){
+
+
+
+
+		for(int j = 0; j < 27; j++){
+
+			if(buffer[i] == alpha[j]){
+
+				firstword = j;
+
+			}
+
+			if(finalKey[i] == alpha[j]){
+
+				secondWord = j;
+
+			}
+
+
+		}
+		encryptSum = (firstWord + secondWord) % 27;
+		buffer[i] = alpha[encryptSum];
+
+	}
+
+	charWritten = send(conectionSocket, buffer, strlen(buffer), 0);
+
+	close(connectionSocket);
+
 }
 
 int main(int argc, char *argv[]){
