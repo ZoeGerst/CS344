@@ -32,13 +32,79 @@ void setupAddressStruct(struct sockaddr_in* address,
   address->sin_addr.s_addr = INADDR_ANY;
 }
 
-void encryption(int connectionSocket, char* buffer, char* finalKey){
+void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphText, char* clientAccecpted, char* clientRejected){
 
 	int firstWord;
 	int secondWord;
 	int encryptSum = 0;
 	char alpha[] = "ABCDEFGHIJKLMNOPQRUSTUVWXYZ ";
 	int charWritten;
+	int charRead;
+	int readSocket = 0;
+	char clientP[25];
+
+	memset(clientP, '\0', sizeof(clientP));
+
+	charRead = recv(connectionSocket, clientP, sizeof(clientP), 0);
+
+	if(charRead < 0){
+
+		error("SERVER: ERROR reading socket");
+
+	}
+	if(strstr(clientP, "enc_client") != NULL){
+
+		charWritten = send(connectionSocket, clientAccepted, sizeof(clientAccepted), 0);
+		if(charWritten < 0){
+
+			error("SERVER: ERROR writing socket");
+
+		}
+
+	}
+	else{
+
+		charWritten = send(connectionSocket, clientRejected, sizeof(clientRejected), 0);
+
+		if(charWritten < 0){
+
+			error("SERVER: ERROR writing socket");
+		}
+
+		fprintf(stderr, "SERVER: unexpected program\n");
+		exit(1);
+
+	}
+
+	charRead = recv(connectionSocket, &readSocket, sizeof(readSocket), 0);
+	if(charRead < 0){
+
+		error("SERVER: ERROR reading socket");
+
+	}
+
+	memset(buffer, '\0', sizeof(finalKey));
+
+	charRead = recv(connectionSocket, buffer, readSocket, 0);
+
+	if(charRead < 0){
+
+		error("SERVER: ERROR reading socket");
+
+	}
+
+	memset(finalKey, '\0', sizeof(finalKey));
+	charRead = recv(connectionSocket, finalKey, readSocket, 0);
+
+	if(charRead < 0){
+
+		error("SERVER: ERROR reading socket");
+
+	}
+
+	memset(ciphText, '\0', sizeof(ciphText));
+
+	
 	
 
 	for(int i = 0; i < strlen(buffer); i++){
@@ -82,6 +148,7 @@ int main(int argc, char *argv[]){
   	char buffer[SIZE];
 	char clientAccepted[] = "accept";
 	char clientRejected[] = "reject";
+	char ciphText[SIZE];
 	pid_t childPid;
   	struct sockaddr_in serverAddress, clientAddress;
   	socklen_t sizeOfClientInfo = sizeof(clientAddress);
@@ -135,7 +202,7 @@ int main(int argc, char *argv[]){
 			else if(childPid == 0){
 
 				close(listenSocket);
-				encryption(connectionSocket, buffer, finalKey);
+				encryption(connectionSocket, buffer, finalKey, ciphText, clientAccepted, clientRejected);
 
 				exit(0);
 
