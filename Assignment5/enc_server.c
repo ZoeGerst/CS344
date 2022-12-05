@@ -129,11 +129,14 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 		}
 		encryptSum = (firstWord + secondWord) % 27;
-		buffer[i] = alpha[encryptSum];
+		ciphText[i] = alpha[encryptSum];
 
 	}
 
-	charWritten = send(conectionSocket, buffer, strlen(buffer), 0);
+	printf("%s\n", ciphText);
+
+	charWritten = send(conectionSocket, ciphText, readSocket, 0);
+
 
 	close(connectionSocket);
 

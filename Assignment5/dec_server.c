@@ -32,11 +32,11 @@ void setupAddressStruct(struct sockaddr_in* address,
   address->sin_addr.s_addr = INADDR_ANY;
 }
 
-void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphText, char* clientAccecpted, char* clientRejected){
+void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphText, char* clientAccecpted, char* clientRejected){
 
 	int firstWord;
 	int secondWord;
-	int encryptSum = 0;
+	int decryptSum = 0;
 	char alpha[] = "ABCDEFGHIJKLMNOPQRUSTUVWXYZ ";
 	int charWritten;
 	int charRead;
@@ -52,7 +52,7 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 		error("SERVER: ERROR reading socket");
 
 	}
-	if(strstr(clientP, "enc_client") != NULL){
+	if(strstr(clientP, "dec_client") != NULL){
 
 		charWritten = send(connectionSocket, clientAccepted, sizeof(clientAccepted), 0);
 		if(charWritten < 0){
@@ -83,9 +83,11 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	}
 
-	memset(buffer, '\0', sizeof(finalKey));
+	memset(ciphText, '\0', sizeof(ciphText));
+//	memset(buffer, '\0', sizeof(finalKey));
 
-	charRead = recv(connectionSocket, buffer, readSocket, 0);
+	charRead = recv(connectionSocket, ciphText, readSocket, 0);
+//	charRead = recv(connectionSocket, buffer, readSocket, 0);
 
 	if(charRead < 0){
 
@@ -102,19 +104,18 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	}
 
-	memset(ciphText, '\0', sizeof(ciphText));
-
+	memset(buffer, '\0', sizeof(buffer));
 	
 	
 
-	for(int i = 0; i < strlen(buffer); i++){
+	for(int i = 0; i < strlen(ciphText); i++){
 
 
 
 
 		for(int j = 0; j < 27; j++){
 
-			if(buffer[i] == alpha[j]){
+			if(ciphText[i] == alpha[j]){
 
 				firstword = j;
 
@@ -125,15 +126,30 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 				secondWord = j;
 
 			}
-
+			
 
 		}
-		encryptSum = (firstWord + secondWord) % 27;
-		buffer[i] = alpha[encryptSum];
+		decryptSum = firstWord - secondWord;
+
+		if(decryptSum < 0){
+	
+			decryptSum += 27;
+
+		}
+
+		buffer[i] = alpha[decryptSum];
 
 	}
 
-	charWritten = send(conectionSocket, buffer, strlen(buffer), 0);
+	printf("%s\n", buffer);
+
+	charWritten = send(conectionSocket, buffer, readSocket, 0);
+
+	if(charWritten < 0){
+
+		error("SERVER: ERROR writing socket");
+
+	}
 
 	close(connectionSocket);
 
@@ -202,7 +218,7 @@ int main(int argc, char *argv[]){
 			else if(childPid == 0){
 
 				close(listenSocket);
-				encryption(connectionSocket, buffer, finalKey, ciphText, clientAccepted, clientRejected);
+				decryption(connectionSocket, buffer, finalKey, ciphText, clientAccepted, clientRejected);
 
 				exit(0);
 
