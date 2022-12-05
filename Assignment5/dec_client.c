@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
  // 	printf("CLIENT: Enter text to send to the server, and then hit enter: ");
   
 
-	char *pName = "enc_client";
+	char *pName = "dec_client";
 
 	if(send(socketFD, pName, strlen(pName), 0) < 0){
 
@@ -266,10 +266,10 @@ int main(int argc, char *argv[]) {
   
 	if (charsRead < 0){
     
-		error("CLIENT: ERROR reading from socket");
+		error("DEC_CLIENT: ERROR reading from socket");
   	}
   
-	printf("CLIENT: I received this from the server: \"%s\"\n", buffer);
+	printf("DEC_CLIENT: I received this from the server: \"%s\"\n", buffer);
 
   // Close the socket
   
