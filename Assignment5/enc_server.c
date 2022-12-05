@@ -215,6 +215,27 @@ int main(int argc, char *argv[]){
 
 		}
 
+		else{
+
+			fprintf(stderr, "Waiting for completion\n");
+
+		}
+
+		for(int i = 0; i < 5; i++){
+
+			if(waitpid(-1, &next, WNOHANG) == -1){
+
+				fprintf(stderr, "SERVER: ERROR waitpid\n");
+
+			}
+			if(WIFEXITED(next)){
+
+				pInt--;
+
+			}
+
+		}
+
 		
 
     /*printf("SERVER: Connected to client running at host %d port %d\n", 
