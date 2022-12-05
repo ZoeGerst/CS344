@@ -74,10 +74,17 @@ void encryption(int connectionSocket, char* buffer, char* finalKey){
 }
 
 int main(int argc, char *argv[]){
-  int connectionSocket, charsRead;
-  char buffer[256];
-  struct sockaddr_in serverAddress, clientAddress;
-  socklen_t sizeOfClientInfo = sizeof(clientAddress);
+  	int connectionSocket, charsRead;
+	int charsWritten;
+	int next;
+	int pInt;
+	char finalKey[SIZE];
+  	char buffer[SIZE];
+	char clientAccepted[] = "accept";
+	char clientRejected[] = "reject";
+	pid_t childPid;
+  	struct sockaddr_in serverAddress, clientAddress;
+  	socklen_t sizeOfClientInfo = sizeof(clientAddress);
 
   // Check usage & args
   if (argc < 2) { 
@@ -105,16 +112,45 @@ int main(int argc, char *argv[]){
   listen(listenSocket, 5); 
   
   // Accept a connection, blocking if one is not available until one connects
-  while(1){
-    // Accept the connection request which creates a connection socket
-    connectionSocket = accept(listenSocket, 
-                (struct sockaddr *)&clientAddress, 
-                &sizeOfClientInfo); 
-    if (connectionSocket < 0){
-      error("ERROR on accept");
-    }
+	pInt = 0;
 
-    printf("SERVER: Connected to client running at host %d port %d\n", 
+  	while(1){
+    // Accept the connection request which creates a connection socket
+    	connectionSocket = accept(listenSocket, 
+                	(struct sockaddr *)&clientAddress, 
+                	&sizeOfClientInfo); 
+    	if (connectionSocket < 0){
+      		error("ERROR on accept");
+    	}
+
+		if(pInt < 5){
+
+			childPid = fork();
+
+			if(childPid == -1){
+	
+				error("ERROR on fork");
+
+			}
+			else if(childPid == 0){
+
+				close(listenSocket);
+				encryption(connectionSocket, buffer, finalKey);
+
+				exit(0);
+
+			}
+			else{
+
+				pInt++;
+
+			}
+
+		}
+
+		
+
+    /*printf("SERVER: Connected to client running at host %d port %d\n", 
                           ntohs(clientAddress.sin_addr.s_addr),
                           ntohs(clientAddress.sin_port));
 
@@ -134,7 +170,7 @@ int main(int argc, char *argv[]){
       error("ERROR writing to socket");
     }
     // Close the connection socket for this client
-    close(connectionSocket); 
+    close(connectionSocket); */
   }
   // Close the listening socket
   close(listenSocket); 
