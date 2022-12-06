@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   	struct sockaddr_in serverAddress;
   	char buffer[SIZE];
 	char finalKey[SIZE];
-	FILE *plaintext;
+	FILE *ciphertext;
 	FILE *keyFile;
 
 
@@ -110,12 +110,12 @@ int main(int argc, char *argv[]) {
 
 	}
 
-	plaintext = fopen(argv[1], "r");
-	if(plaintext == NULL){
+	ciphertext = fopen(argv[1], "r");
+	if(ciphertext == NULL){
 
 		close(socketFD);
 		fprintf(stderr, "CLIENT: ERROR opening %s file\n", argv[1]);
-		exit(0)l
+		exit(0);
 		
 	}
 
@@ -123,9 +123,10 @@ int main(int argc, char *argv[]) {
 	// Clear out the buffer array
   	memset(buffer, '\0', sizeof(buffer));
 
-	fscanf(plaintext, "%[^\n]", buffer);
+	fscanf(ciphertext, "%[^\n]", buffer);
 
 	int wrong;
+	fprintf(stderr, "%s\n", buffer);
 	for(int i = 0; i < strlen(buffer); i++){
 
 		char str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
@@ -145,7 +146,8 @@ int main(int argc, char *argv[]) {
 		if(wrong > 26){
 
 			close(socketFD);
-			fprintf(stderr, "CLIENT: ERROR input contains bad characters\n");
+			fprintf(stderr, "buffer %d\n", buffer[i]);
+			fprintf(stderr, "DEC_CLIENT: ERROR input contains bad characters\n");
 			exit(1);
 
 		}
@@ -153,7 +155,7 @@ int main(int argc, char *argv[]) {
 	}
 
 
-	fclose(plaintext);
+	fclose(ciphertext);
 
 	keyFile = fopen(argv[2], "r");
 
@@ -172,7 +174,7 @@ int main(int argc, char *argv[]) {
 	int wrongK;
 	for(int i = 0; i < strlen(finalKey); i++){
 
-		char str[] = "ABCDFEGHIJKLMNOPQRSTUVWXYZ ";
+		char str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 		wrongK = 0;
 
 		for(int j = 0; j < 27; j++){
@@ -188,7 +190,8 @@ int main(int argc, char *argv[]) {
 		if(wrongK > 26){
 
 			close(socketFD);
-			fprintf(stderr, "CLIENT: ERROR input contains bad characters\n");
+			printf("buffer %d\n", buffer[i]);
+			fprintf(stderr, "DEC_CLIENT: ERROR input contains bad characters\n");
 			exit(1);
 
 		}
@@ -201,7 +204,7 @@ int main(int argc, char *argv[]) {
 
 		close(socketFD);
 		fprintf(stderr, "CLIENT: ERROR key '%s' is too short\n", argv[2]);
-		exit(1)
+		exit(1);
 
 	}
 

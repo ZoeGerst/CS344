@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
 
 		close(socketFD);
 		fprintf(stderr, "CLIENT: ERROR opening %s file\n", argv[1]);
-		exit(0)l
+		exit(0);
 		
 	}
 
@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
 
 		close(socketFD);
 		fprintf(stderr, "CLIENT: ERROR key '%s' is too short\n", argv[2]);
-		exit(1)
+		exit(1);
 
 	}
 
@@ -269,7 +269,7 @@ int main(int argc, char *argv[]) {
 		error("CLIENT: ERROR reading from socket");
   	}
   
-	printf("CLIENT: I received this from the server: \"%s\"\n", buffer);
+	printf("%s", buffer);
 
   // Close the socket
   

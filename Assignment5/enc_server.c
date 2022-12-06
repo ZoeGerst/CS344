@@ -8,6 +8,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <fcntl.h>
 
 #define SIZE 150000
 
@@ -32,7 +35,7 @@ void setupAddressStruct(struct sockaddr_in* address,
   address->sin_addr.s_addr = INADDR_ANY;
 }
 
-void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphText, char* clientAccecpted, char* clientRejected){
+void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphText, char* clientAccepted, char* clientRejected){
 
 	int firstWord;
 	int secondWord;
@@ -116,7 +119,7 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 			if(buffer[i] == alpha[j]){
 
-				firstword = j;
+				firstWord = j;
 
 			}
 
@@ -133,9 +136,9 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	}
 
-	printf("%s\n", ciphText);
+//	printf("%s\n", ciphText);
 
-	charWritten = send(conectionSocket, ciphText, readSocket, 0);
+	charWritten = send(connectionSocket, ciphText, readSocket, 0);
 
 
 	close(connectionSocket);

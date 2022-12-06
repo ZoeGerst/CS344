@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <time.h>
 
-int main(int ardc, char argv[]){
+int main(int argc, char* argv[]){
 
 
 
@@ -21,6 +21,9 @@ int main(int ardc, char argv[]){
 
 	}
 
+//	char *pointer;
+//	pointer = &argv[1];
+
 	int keylength = atoi(argv[1]);
 	char finalKey[atoi(argv[1])];
 	memset(finalKey, '\0', sizeof(finalKey));
@@ -28,6 +31,8 @@ int main(int ardc, char argv[]){
 
 	if(keylength <= 0){
 
+		printf("keylength is %d\n", argc);
+		printf("argv %s\n", argv);
 		fprintf(stderr, "Keylength must be greater than 0\n");
 		exit(0);
 
