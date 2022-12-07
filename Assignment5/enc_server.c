@@ -39,8 +39,7 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	int firstWord;
 	int secondWord;
-	int encryptSum = 0;
-	char alpha[] = "ABCDEFGHIJKLMNOPQRUSTUVWXYZ ";
+	int encryptSum;
 	int charWritten;
 	int charRead;
 	int readSocket = 0;
@@ -112,7 +111,8 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	for(int i = 0; i < strlen(buffer); i++){
 
-
+		encryptSum = 0;
+		char alpha[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 
 
 		for(int j = 0; j < 27; j++){
@@ -129,6 +129,11 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 			}
 
+		//	if(finalKey[i] == " "){
+
+				
+
+		//	}
 
 		}
 		encryptSum = (firstWord + secondWord) % 27;

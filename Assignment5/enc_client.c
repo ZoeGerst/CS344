@@ -55,11 +55,12 @@ int main(int argc, char *argv[]) {
   // Check usage & args
   	if (argc < 4) {
  
-    	fprintf(stderr,"USAGE: %s hostname port\n", argv[0]); 
+    	fprintf(stderr,"CLIENT: USAGE: %s hostname port\n", argv[0]); 
     	exit(0); 
   	} 
 
   // Create a socket
+    //fprintf(stderr,"TEST %s\n", argv[0]); 
   	socketFD = socket(AF_INET, SOCK_STREAM, 0); 
   	
 	if (socketFD < 0){
@@ -68,7 +69,8 @@ int main(int argc, char *argv[]) {
   	}
 
    // Set up the server address struct
-  	setupAddressStruct(&serverAddress, atoi(argv[3]), "localhost");
+  	setupAddressStruct(&serverAddress, atoi(argv[3]), "localhost"); //atoi(argv[3]), "localhost")
+    //fprintf(stderr,"TEST %s\n", argv[0]); 
 
   // Connect to server
   	if (connect(socketFD, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0){
@@ -172,7 +174,7 @@ int main(int argc, char *argv[]) {
 	int wrongK;
 	for(int i = 0; i < strlen(finalKey); i++){
 
-		char str[] = "ABCDFEGHIJKLMNOPQRSTUVWXYZ ";
+		char str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 		wrongK = 0;
 
 		for(int j = 0; j < 27; j++){

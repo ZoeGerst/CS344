@@ -41,8 +41,7 @@ void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	int firstWord;
 	int secondWord;
-	int decryptSum = 0;
-	char alpha[] = "ABCDEFGHIJKLMNOPQRUSTUVWXYZ ";
+	int decryptSum;
 	int charWritten;
 	int charRead;
 	int readSocket = 0;
@@ -116,6 +115,8 @@ void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 	for(int i = 0; i < strlen(ciphText); i++){
 
 
+		decryptSum = 0;
+		char alpha[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 
 
 		for(int j = 0; j < 27; j++){
@@ -143,14 +144,30 @@ void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 		}
 
+		//char arrSpace[] = " ";
+		//if(alpha[decryptSum] == arrSpace){
+
+		//	buffer[i] = arrSpace;
+
+		//}
+		//else{
 		buffer[i] = alpha[decryptSum];
+	//charWritten = send(connectionSocket, buffer, readSocket, 0);
+
+//		printf("%s\n", alpha[decryptSum]);
+
+	//	}
 
 	}
 
+	//for(int x = 0; x < buffer[x]; x++){
+
 	printf("%s\n", buffer);
 
-	charWritten = send(connectionSocket, buffer, readSocket, 0);
+	//}
 
+
+	charWritten = send(connectionSocket, buffer, readSocket, 0);
 	if(charWritten < 0){
 
 		error("SERVER: ERROR writing socket");

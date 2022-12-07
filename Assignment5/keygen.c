@@ -31,8 +31,8 @@ int main(int argc, char* argv[]){
 
 	if(keylength <= 0){
 
-		printf("keylength is %d\n", argc);
-		printf("argv %s\n", argv);
+	//	printf("keylength is %d\n", argc);
+	//	printf("argv %s\n", argv);
 		fprintf(stderr, "Keylength must be greater than 0\n");
 		exit(0);
 
