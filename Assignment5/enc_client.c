@@ -1,4 +1,9 @@
-
+//Zoe Gerst
+//12/7/2022
+//CS344
+//Assignment 5: One-Time Pads: enc_client.c
+//Works Cited:
+//https://replit.com/@cs344/83clientc?lite=true#client.c
 
 
 #include <stdio.h>
@@ -84,6 +89,7 @@ int main(int argc, char *argv[]) {
  // 	printf("CLIENT: Enter text to send to the server, and then hit enter: ");
   
 
+	//sends to dec_server
 	char *pName = "enc_client";
 
 	if(send(socketFD, pName, strlen(pName), 0) < 0){
@@ -128,6 +134,8 @@ int main(int argc, char *argv[]) {
 	fscanf(plaintext, "%[^\n]", buffer);
 
 	int wrong;
+
+	//goes through buffer string
 	for(int i = 0; i < strlen(buffer); i++){
 
 		char str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
@@ -135,6 +143,7 @@ int main(int argc, char *argv[]) {
 
 		for(int j = 0; j < 27; j++){
 
+			//finds bad characters
 			if(buffer[i] != str[j]){
 
 				wrong++;
@@ -157,6 +166,8 @@ int main(int argc, char *argv[]) {
 
 	fclose(plaintext);
 
+	//finds bad files
+
 	keyFile = fopen(argv[2], "r");
 
 	if(keyFile == NULL){
@@ -172,6 +183,8 @@ int main(int argc, char *argv[]) {
 	fscanf(keyFile, "%[^\n]", finalKey);
 
 	int wrongK;
+
+	//finds bad characters
 	for(int i = 0; i < strlen(finalKey); i++){
 
 		char str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
@@ -199,6 +212,7 @@ int main(int argc, char *argv[]) {
 
 	fclose(keyFile);
 
+	//compares key to the length of the buffer
 	if(strlen(finalKey) < strlen(buffer)){
 
 		close(socketFD);
