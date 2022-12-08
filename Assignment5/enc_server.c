@@ -1,4 +1,9 @@
-
+//Zoe Gerst
+//12/7/2022
+//CS344
+//Assignment 5: One-Time Pads: enc_server.c
+//Works Cited:
+//https://replit.com/@cs344/83serverc?lite=true#server.c
 
 
 #include <stdio.h>
@@ -47,10 +52,13 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	memset(clientP, '\0', sizeof(clientP));
 
+
+	//gets data from enc_client
 	charRead = recv(connectionSocket, clientP, sizeof(clientP), 0);
 
 	if(charRead < 0){
 
+		//error messages
 		error("SERVER: ERROR reading socket");
 
 	}
@@ -85,6 +93,7 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	}
 
+	//gets size of file
 	memset(buffer, '\0', sizeof(finalKey));
 
 	charRead = recv(connectionSocket, buffer, readSocket, 0);
@@ -108,9 +117,10 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	
 	
-
+	//actual encryption process
 	for(int i = 0; i < strlen(buffer); i++){
 
+		//allows sum to start from the beginning when counting
 		encryptSum = 0;
 		char alpha[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 
@@ -136,13 +146,18 @@ void encryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 		//	}
 
 		}
+
+		//encryption algorithm
 		encryptSum = (firstWord + secondWord) % 27;
+
+		//stores in ciphertext program
 		ciphText[i] = alpha[encryptSum];
 
 	}
 
 //	printf("%s\n", ciphText);
 
+	//sends to enc_client
 	charWritten = send(connectionSocket, ciphText, readSocket, 0);
 
 
@@ -165,29 +180,29 @@ int main(int argc, char *argv[]){
   	socklen_t sizeOfClientInfo = sizeof(clientAddress);
 
   // Check usage & args
-  if (argc < 2) { 
-    fprintf(stderr,"USAGE: %s port\n", argv[0]); 
-    exit(1);
-  } 
+  	if (argc < 2) { 
+    	fprintf(stderr,"USAGE: %s port\n", argv[0]); 
+    	exit(1);
+  	} 
   
   // Create the socket that will listen for connections
-  int listenSocket = socket(AF_INET, SOCK_STREAM, 0);
-  if (listenSocket < 0) {
-    error("ERROR opening socket");
-  }
+  	int listenSocket = socket(AF_INET, SOCK_STREAM, 0);
+  	if (listenSocket < 0) {
+    	error("ERROR opening socket");
+  	}
 
   // Set up the address struct for the server socket
-  setupAddressStruct(&serverAddress, atoi(argv[1]));
+  	setupAddressStruct(&serverAddress, atoi(argv[1]));
 
   // Associate the socket to the port
-  if (bind(listenSocket, 
-          (struct sockaddr *)&serverAddress, 
-          sizeof(serverAddress)) < 0){
-    error("ERROR on binding");
-  }
+  	if (bind(listenSocket, 
+          	(struct sockaddr *)&serverAddress, 
+          	sizeof(serverAddress)) < 0){
+    	error("ERROR on binding");
+  	}
 
   // Start listening for connetions. Allow up to 5 connections to queue up
-  listen(listenSocket, 5); 
+  	listen(listenSocket, 5); 
   
   // Accept a connection, blocking if one is not available until one connects
 	pInt = 0;
@@ -210,6 +225,8 @@ int main(int argc, char *argv[]){
 				error("ERROR on fork");
 
 			}
+
+			//encryption process
 			else if(childPid == 0){
 
 				close(listenSocket);
@@ -270,8 +287,8 @@ int main(int argc, char *argv[]){
     }
     // Close the connection socket for this client
     close(connectionSocket); */
-  }
+ 	}
   // Close the listening socket
-  close(listenSocket); 
-  return 0;
+  	close(listenSocket); 
+  	return 0;
 }
