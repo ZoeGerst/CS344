@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
 	fscanf(ciphertext, "%[^\n]", buffer);
 
 	int wrong;
-	fprintf(stderr, "%s\n", buffer);
+//	fprintf(stderr, "%s\n", buffer);
 	for(int i = 0; i < strlen(buffer); i++){
 
 		char str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
@@ -272,7 +272,7 @@ int main(int argc, char *argv[]) {
 		error("DEC_CLIENT: ERROR reading from socket");
   	}
   
-	printf("DEC_CLIENT: I received this from the server: \"%s\"\n", buffer);
+	printf("%s\n", buffer);
 
   // Close the socket
   

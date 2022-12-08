@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 
 		fprintf(stderr, "CLIENT: ERROR dec_server denied connection on port %d\n", atoi(argv[3]));
 		close(socketFD);
-		exit(1);
+		exit(2);
 
 	}
 
@@ -271,7 +271,7 @@ int main(int argc, char *argv[]) {
 		error("CLIENT: ERROR reading from socket");
   	}
   
-	printf("%s", buffer);
+	printf("%s\n", buffer);
 
   // Close the socket
   

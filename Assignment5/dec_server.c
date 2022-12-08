@@ -162,7 +162,7 @@ void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	//for(int x = 0; x < buffer[x]; x++){
 
-	printf("%s\n", buffer);
+	//printf("%s\n", buffer);
 
 	//}
 
