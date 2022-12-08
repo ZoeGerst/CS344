@@ -1,4 +1,9 @@
-
+//Zoe Gerst
+//12/7/2022
+//CS344
+//Assignment 5: One-Time Pads: dec_client.c
+//Works Cited:
+//https://replit.com/@cs344/83clientc?lite=true#client.c
 
 
 #include <stdio.h>
@@ -82,6 +87,7 @@ int main(int argc, char *argv[]) {
  // 	printf("CLIENT: Enter text to send to the server, and then hit enter: ");
   
 
+	//sends to enc_server
 	char *pName = "dec_client";
 
 	if(send(socketFD, pName, strlen(pName), 0) < 0){
@@ -102,6 +108,7 @@ int main(int argc, char *argv[]) {
 
 	}
 
+	//checks port #
 	if(strstr(sockErr, "reject") != NULL){
 
 		fprintf(stderr, "CLIENT: ERROR dec_server denied connection on port %d\n", atoi(argv[3]));
@@ -127,6 +134,8 @@ int main(int argc, char *argv[]) {
 
 	int wrong;
 //	fprintf(stderr, "%s\n", buffer);
+//
+//	checks for bad characters
 	for(int i = 0; i < strlen(buffer); i++){
 
 		char str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
@@ -159,6 +168,7 @@ int main(int argc, char *argv[]) {
 
 	keyFile = fopen(argv[2], "r");
 
+	//checks for bad file
 	if(keyFile == NULL){
 
 		close(socketFD);
@@ -172,6 +182,8 @@ int main(int argc, char *argv[]) {
 	fscanf(keyFile, "%[^\n]", finalKey);
 
 	int wrongK;
+
+	//checks for bad characters
 	for(int i = 0; i < strlen(finalKey); i++){
 
 		char str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
@@ -200,6 +212,7 @@ int main(int argc, char *argv[]) {
 
 	fclose(keyFile);
 
+	//compares key length to buffer length
 	if(strlen(finalKey) < strlen(buffer)){
 
 		close(socketFD);
