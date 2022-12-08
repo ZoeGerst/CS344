@@ -1,4 +1,9 @@
-
+//Zoe Gerst
+//12/7/2022
+//CS344
+//Assignment 5: One-Time Pads: dec_server.c
+//Works Cited:
+//https://replit.com/@cs344/83serverc?lite=true#server.c
 
 
 #include <stdio.h>
@@ -49,10 +54,13 @@ void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	memset(clientP, '\0', sizeof(clientP));
 
+	//gets ciphertexts from dec_client
 	charRead = recv(connectionSocket, clientP, sizeof(clientP), 0);
 
 	if(charRead < 0){
 
+
+		//error messages
 		error("SERVER: ERROR reading socket");
 
 	}
@@ -87,6 +95,7 @@ void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 	}
 
+	//gets size of file
 	memset(ciphText, '\0', sizeof(ciphText));
 //	memset(buffer, '\0', sizeof(finalKey));
 
@@ -98,6 +107,7 @@ void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 		error("SERVER: ERROR reading socket");
 
 	}
+
 
 	memset(finalKey, '\0', sizeof(finalKey));
 	charRead = recv(connectionSocket, finalKey, readSocket, 0);
@@ -112,9 +122,10 @@ void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 	
 	
 
+	//the actual decrypting process
 	for(int i = 0; i < strlen(ciphText); i++){
 
-
+		//allows sum to start from the beginning when counting
 		decryptSum = 0;
 		char alpha[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 
@@ -134,8 +145,9 @@ void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 			}
 			
 
-		} 
-		//FIX HERE
+		}
+
+		//decryption algorithm 
 		decryptSum = firstWord - secondWord;
 
 		if(decryptSum < 0){
@@ -151,6 +163,8 @@ void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 
 		//}
 		//else{
+		//
+		//stores decryption in buffer
 		buffer[i] = alpha[decryptSum];
 	//charWritten = send(connectionSocket, buffer, readSocket, 0);
 
@@ -167,6 +181,7 @@ void decryption(int connectionSocket, char* buffer, char* finalKey, char* ciphTe
 	//}
 
 
+	//sends to dec_client
 	charWritten = send(connectionSocket, buffer, readSocket, 0);
 	if(charWritten < 0){
 
@@ -238,6 +253,7 @@ int main(int argc, char *argv[]){
 				error("ERROR on fork");
 
 			}
+			//decryption process
 			else if(childPid == 0){
 
 				close(listenSocket);
